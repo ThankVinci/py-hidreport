@@ -17,6 +17,7 @@ from py_hidreport.items import Mainitem, Globalitem, Localitem, CollectionitemTy
 from py_hidreport.items.Main import Input
 from py_hidreport.items.Main import Data, Variable, Absolute
 
+
 # MainItem
 Output = ShortItem(Mainitem.Output)
 Feature = ShortItem(Mainitem.Output)
@@ -53,59 +54,61 @@ Delimiter = ShortItem(Localitem.Delimiter)
 Pages
 '''
 
+from pages import *
+
 class UsagePages(IntEnum):
     Undefined                   = 0x00
-    GenericDesktopPage          = 0x01
-    SimulationControlsPage      = 0x02
-    VRControlsPage              = 0x03
-    SportControlsPage           = 0x04
-    GameControlsPage            = 0x05
-    GenericDeviceControlsPage   = 0x06
-    KeyboardPage                = 0x07
-    KeypadPage                  = 0x07
-    LEDPage                     = 0x08
-    ButtonPage                  = 0x09
-    OrdinalPage                 = 0x0a
-    TelephonyDevicePage         = 0x0b
-    ConsumerPage                = 0x0c
-    DigitizersPage              = 0x0d
-    HapticsPage                 = 0x0e
-    PhysicalInputDevicePage     = 0x0f
-    UnicodePage                 = 0x10
-    SoCPage                     = 0x11
-    EyeandHeadTrackersPage      = 0x12
+    GenericDesktop              = GenericDesktopPageId
+    SimulationControls          = SimulationControlsPageId
+    VRControls                  = VRControlsPageId
+    SportControls               = SportControlsPageId
+    GameControls                = GameControlsPageId
+    GenericDeviceControls       = GenericDeviceControlsPageId
+    Keyboard                    = KeyboardPageId
+    Keypad                      = KeypadPageId
+    LED                         = LEDPageId
+    Button                      = ButtonPageId
+    Ordinal                     = OrdinalPageId
+    TelephonyDevice             = TelephonyDevicePageId
+    Consumer                    = ConsumerPageId
+    Digitizers                  = DigitizersPageId
+    Haptics                     = HapticsPageId
+    PhysicalInputDevice         = PhysicalInputDevicePageId
+    Unicode                     = 0x10
+    SoC                         = SoCPageId
+    EyeandHeadTrackers          = EyeandHeadTrackersPageId
     __Reserved0                 = 0x13 # 0x13~0x13
-    AuxiliaryDisplayPage        = 0x14
+    AuxiliaryDisplay            = AuxiliaryDisplayPageId
     __Reserved1_BEGIN           = 0x15 # 0x15~0x1F
     __Reserved1_END             = 0x1F
-    SensorsPage                 = 0x20
+    Sensors                     = SensorsPageId
     __Reserved2_BEGIN           = 0x21 # 0x21~0x3F
     __Reserved2_END             = 0x3F
-    MedicalInstrumentPage       = 0x40
-    BrailleDisplayPage          = 0x41
+    MedicalInstrument           = MedicalInstrumentPageId
+    BrailleDisplay              = BrailleDisplayPageId
     __Reserved3_BEGIN           = 0x42 # 0x42~0x58
     __Reserved3_END             = 0x58
-    LightingAndIlluminationPage = 0x59
+    LightingAndIllumination     = LightingAndIlluminationPageId
     __Reserved4_BEGIN           = 0x5A # 0x5A~0x7F
     __Reserved4_END             = 0x7F
-    MonitorPage                 = 0x80
-    MonitorEnumeratedPage       = 0x81
-    VESAVirtualControlsPage     = 0x82
+    Monitor                     = MonitorPageId
+    MonitorEnumerated           = MonitorEnumeratedPageId
+    VESAVirtualControls         = VESAVirtualControlsPageId
     __Reserved5                 = 0x83 # 0x83~0x83
-    PowerPage                   = 0x84
-    BatterySystemPage           = 0x85
+    Power                       = PowerPageId
+    BatterySystem               = BatterySystemPageId
     __Reserved6_BEGIN           = 0x86 # 0x86~0x8B
     __Reserved6_END             = 0x8B
-    BarcodeScannerPage          = 0x8C
-    ScalesPage                  = 0x8D
-    MagneticStripeReaderPage    = 0x8E
+    BarcodeScanner              = BarcodeScannerPageId
+    Scales                      = ScalesPageId
+    MagneticStripeReader        = MagneticStripeReaderPageId
     __Reserved7                 = 0x8F # 0x8F~0x8F
-    CameraControlPage           = 0x90
-    ArcadePage                  = 0x91
-    GamingDevicePage            = 0x92
+    CameraControl               = CameraControlPageId
+    Arcade                      = ArcadePageId
+    GamingDevice                = 0x92
     __Reserved8_BEGIN           = 0x93 # 0x93~0xF1CF
     __Reserved8_END             = 0xF1CF
-    FIDOAlliancePage            = 0xF1D0
+    FIDOAlliance                = FIDOAlliancePageId
     __Reserved9_BEGIN           = 0xF1D1 # 0xF1D0~0xFEFF
     __Reserved9_END             = 0xFEFF
     Vendordefined_BEGIN         = 0xFF00
@@ -126,6 +129,8 @@ class UsagePages(IntEnum):
             return __pseudo_member
         raise ValueError(f"{value} is not a valid UsagePages")
 
+Usages = {UsagePages.GenericDesktop:GenericDesktopPage}
+
 class Page():
     def __init__(self, page):
         self.__page = page
@@ -133,45 +138,44 @@ class Page():
         __page_v = self.__page
         return bytes(__page_v)
 
-GenericDesktop = Page(UsagePages.GenericDesktopPage)
-SimulationControls = Page(UsagePages.SimulationControlsPage)
-VRControls = Page(UsagePages.VRControlsPage)
-SportControls = Page(UsagePages.SportControlsPage)
-GameControls = Page(UsagePages.GameControlsPage)
-GenericDeviceControls = Page(UsagePages.GenericDeviceControlsPage)
-Keyboard = Page(UsagePages.KeyboardPage)
-Keypad = Page(UsagePages.KeypadPage)
-LED = Page(UsagePages.LEDPage)
-Button = Page(UsagePages.ButtonPage)
-Ordinal = Page(UsagePages.OrdinalPage)
-TelephonyDevice = Page(UsagePages.TelephonyDevicePage)
-Consumer = Page(UsagePages.ConsumerPage)
-Digitizers = Page(UsagePages.DigitizersPage)
-Haptics = Page(UsagePages.HapticsPage)
-PhysicalInputDevice = Page(UsagePages.PhysicalInputDevicePage)
-Unicode = Page(UsagePages.UnicodePage)
-SoC = Page(UsagePages.SoCPage)
-EyeandHeadTrackers = Page(UsagePages.EyeandHeadTrackersPage)
-AuxiliaryDisplay = Page(UsagePages.AuxiliaryDisplayPage)
-Sensors = Page(UsagePages.SensorsPage)
-MedicalInstrument = Page(UsagePages.MedicalInstrumentPage)
-BrailleDisplay = Page(UsagePages.BrailleDisplayPage)
-LightingAndIllumination = Page(UsagePages.LightingAndIlluminationPage)
-Monitor = Page(UsagePages.MonitorPage)
-MonitorEnumerated = Page(UsagePages.MonitorEnumeratedPage)
-VESAVirtualControls = Page(UsagePages.VESAVirtualControlsPage)
-Power = Page(UsagePages.PowerPage)
-BatterySystem = Page(UsagePages.BatterySystemPage)
-BarcodeScanner = Page(UsagePages.BarcodeScannerPage)
-Scales = Page(UsagePages.ScalesPage)
-MagneticStripeReader = Page(UsagePages.MagneticStripeReaderPage)
-CameraControl = Page(UsagePages.CameraControlPage)
-Arcade = Page(UsagePages.ArcadePage)
-GamingDevice = Page(UsagePages.GamingDevicePage)
-FIDOAlliance = Page(UsagePages.FIDOAlliancePage)
+GenericDesktop = Page(UsagePages.GenericDesktop)
+SimulationControls = Page(UsagePages.SimulationControls)
+VRControls = Page(UsagePages.VRControls)
+SportControls = Page(UsagePages.SportControls)
+GameControls = Page(UsagePages.GameControls)
+GenericDeviceControls = Page(UsagePages.GenericDeviceControls)
+Keyboard = Page(UsagePages.Keyboard)
+Keypad = Page(UsagePages.Keypad)
+LED = Page(UsagePages.LED)
+Button = Page(UsagePages.Button)
+Ordinal = Page(UsagePages.Ordinal)
+TelephonyDevice = Page(UsagePages.TelephonyDevice)
+Consumer = Page(UsagePages.Consumer)
+Digitizers = Page(UsagePages.Digitizers)
+Haptics = Page(UsagePages.Haptics)
+PhysicalInputDevice = Page(UsagePages.PhysicalInputDevice)
+Unicode = Page(UsagePages.Unicode)
+SoC = Page(UsagePages.SoC)
+EyeandHeadTrackers = Page(UsagePages.EyeandHeadTrackers)
+AuxiliaryDisplay = Page(UsagePages.AuxiliaryDisplay)
+Sensors = Page(UsagePages.Sensors)
+MedicalInstrument = Page(UsagePages.MedicalInstrument)
+BrailleDisplay = Page(UsagePages.BrailleDisplay)
+LightingAndIllumination = Page(UsagePages.LightingAndIllumination)
+Monitor = Page(UsagePages.Monitor)
+MonitorEnumerated = Page(UsagePages.MonitorEnumerated)
+VESAVirtualControls = Page(UsagePages.VESAVirtualControls)
+Power = Page(UsagePages.Power)
+BatterySystem = Page(UsagePages.BatterySystem)
+BarcodeScanner = Page(UsagePages.BarcodeScanner)
+Scales = Page(UsagePages.Scales)
+MagneticStripeReader = Page(UsagePages.MagneticStripeReader)
+CameraControl = Page(UsagePages.CameraControl)
+Arcade = Page(UsagePages.Arcade)
+GamingDevice = Page(UsagePages.GamingDevice)
+FIDOAlliance = Page(UsagePages.FIDOAlliance)
 VendordefinedFF01 = Page(UsagePages.Vendordefined(0xFF01))
 
-from usages import *
 from items import *
 # 状态机
 

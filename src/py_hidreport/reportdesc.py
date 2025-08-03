@@ -6,7 +6,7 @@ if __name__ == '__main__':
     # 需要注意不同层级中root_path需要调用dirname的次数是不一样的
     import sys
     from os.path import dirname, abspath
-    root_path = dirname(dirname(dirname(dirname(abspath(__file__)))))
+    root_path = dirname(dirname(abspath(__file__)))
     print(root_path)
     sys.path.append(root_path)
 
@@ -17,7 +17,8 @@ if __name__ == '__main__':
 # 报告描述符状态机
 # 可以检查和添加一行描述符，如果描述符不符合规则则报错
 
-from hidusage import ShortItem
+from py_hidreport.items import ShortItem, HIDItemsize
+from py_hidreport.hidusage import UsagePages, UsagePage, Usage
 
 class ReportDescState(IntEnum):
     INITIAL     = 0
@@ -30,12 +31,29 @@ class ReportDescDecoder:
         ...
     
     def decode(self, buff:bytes):
-        item = ShortItem(buff[0]&0xfc)
-        print(item.getname())
+        idx = 0
+        print(len(buff))
+        current_page = UsagePages.Undefined # 当前的用例页
+        while(idx < len(buff)):
+            bTagType = buff[idx] & 0xfc
+            if(bTagType == 0):
+                print('error')
+                break
+            item = ShortItem(bTagType)
+            bSize = buff[idx] & 0x03
+            size = HIDItemsize[bSize]
+            idx += 1
+            data = buff[idx:idx+size]
+            line = f'{item.getname()}: [{data}]'
+            if(current_page != UsagePages.Undefined and item == Usage):
+
+            if(item == UsagePage):
+                current_page = UsagePages(data)
+            idx += size
+            print(line)
 
     def next(self):
         ...
-
 
 class ReportDescStateMachine:
     def __init__(self):

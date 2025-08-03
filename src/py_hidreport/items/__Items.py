@@ -57,21 +57,23 @@ class CollectionitemType(IntEnum):
     Vendor_defined_Begin    = 0x80
     Vendor_defined_End      = 0xFF
 
-class HIDReportDescItem(IntEnum):
+class HIDItemtype(IntEnum):
     MAINITEM    = 0b00000000
     GLOBALITEM  = 0b00000100
     LOCALITEM   = 0b00001000
     __RESERVED  = 0b00001100
     ITEMMASKS    = MAINITEM | GLOBALITEM | LOCALITEM
 
+HIDItemsize = (0, 1, 2, 4)
+
 class ShortItem():
     def __init__(self, item:Union[Mainitem, Globalitem, Localitem]):
-        __type = HIDReportDescItem(item & HIDReportDescItem.ITEMMASKS)
-        if(__type == HIDReportDescItem.MAINITEM):
+        __type = HIDItemtype(item & HIDItemtype.ITEMMASKS)
+        if(__type == HIDItemtype.MAINITEM):
             self.__item = Mainitem(item)
-        elif(__type == HIDReportDescItem.GLOBALITEM):
+        elif(__type == HIDItemtype.GLOBALITEM):
             self.__item = Globalitem(item)
-        elif(__type == HIDReportDescItem.LOCALITEM):
+        elif(__type == HIDItemtype.LOCALITEM):
             self.__item = Localitem(item)
         else:
             raise ValueError()
