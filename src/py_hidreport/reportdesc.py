@@ -18,7 +18,7 @@ if __name__ == '__main__':
 # 可以检查和添加一行描述符，如果描述符不符合规则则报错
 
 from py_hidreport.items import ShortItem, HIDItemsize
-from py_hidreport.hidusage import UsagePages, UsagePage, Usage
+from py_hidreport.hidusage import UsagePages, UsagePage, Usage, Pages
 
 class ReportDescState(IntEnum):
     INITIAL     = 0
@@ -43,10 +43,15 @@ class ReportDescDecoder:
             bSize = buff[idx] & 0x03
             size = HIDItemsize[bSize]
             idx += 1
-            data = buff[idx:idx+size]
-            line = f'{item.getname()}: [{data}]'
+            data = int.from_bytes(buff[idx:idx+size], byteorder='little')
+            line = f'{item.getname()}'
             if(current_page != UsagePages.Undefined and item == Usage):
-
+                line += f'({Pages[current_page](data).name})'
+            else:
+                line += f'({hex(data)})'
+            # print(current_page.name)
+            # print(item)
+            # print(UsagePage)
             if(item == UsagePage):
                 current_page = UsagePages(data)
             idx += size

@@ -111,6 +111,11 @@ class ShortItem():
             __data = arg.to_bytes(length=__size, byteorder='little', signed=__signed)
         __tag_v = self.__item | __size
         return __tag_v.to_bytes(length=1, byteorder='little') + __data
+    
+    def __eq__(self, value):
+        if(type(value) != type(self)):
+            return False
+        return self.__item == value.__item
 
 if __name__ == '__main__':
     Collection = ShortItem(Mainitem.Collection)
