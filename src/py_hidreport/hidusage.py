@@ -14,13 +14,13 @@ Items
 '''
 from py_hidreport.items import ShortItem
 from py_hidreport.items import Mainitem, Globalitem, Localitem, CollectionitemType
-from py_hidreport.items.Main import Input
-from py_hidreport.items.Main import Data, Variable, Absolute
+# from py_hidreport.items.Main import Data, Variable, Absolute
 
 
 # MainItem
+Input = ShortItem(Mainitem.Input)
 Output = ShortItem(Mainitem.Output)
-Feature = ShortItem(Mainitem.Output)
+Feature = ShortItem(Mainitem.Featrue)
 Collection = ShortItem(Mainitem.Collection)
 EndCollection = ShortItem(Mainitem.EndCollection)
 
@@ -129,8 +129,6 @@ class UsagePages(IntEnum):
             return __pseudo_member
         raise ValueError(f"{value} is not a valid UsagePages")
 
-Usages = {UsagePages.GenericDesktop:GenericDesktopPage}
-
 class Page():
     def __init__(self, page):
         self.__page = page
@@ -211,7 +209,7 @@ def main():
     print(LogicalMaximum(127))
     ReportSize(8)
     ReportCount(2)
-    # Input(Data, Variable, Relative)
+    Input(Data, Variable, Relative)
     EndCollection()
     EndCollection()
 

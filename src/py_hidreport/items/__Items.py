@@ -1,5 +1,8 @@
+from __future__ import annotations # 延迟类型解析, 使得包内一些__私有的类型也可以作为另一个类型的参数类型注解, 也可以避免循环引用的问题
 from enum import IntEnum
-from typing import Union, Callable
+from typing import Union, Callable, Tuple
+
+__all__ = []
 
 class Mainitem(IntEnum):
     Input           = 0b10000000 # 最后两位按实际的来
@@ -64,13 +67,16 @@ class HIDItemtype(IntEnum):
     __RESERVED  = 0b00001100
     ITEMMASKS    = MAINITEM | GLOBALITEM | LOCALITEM
 
-HIDItemsize = (0, 1, 2, 4)
+HIDItemsize = (0, 1, 2, 4) # bSize对应的ItemSize
 
 class ShortItem():
-    def __init__(self, item:Union[Mainitem, Globalitem, Localitem]):
+    def __init__(self, item:Union[Mainitem, Globalitem, Localitem], datamainitem = False):
+        self.bitvalues = 0
+        self.bitcount = 0
         __type = HIDItemtype(item & HIDItemtype.ITEMMASKS)
         if(__type == HIDItemtype.MAINITEM):
             self.__item = Mainitem(item)
+            self.__datamainitem = self.__item < Mainitem.Collection
         elif(__type == HIDItemtype.GLOBALITEM):
             self.__item = Globalitem(item)
         elif(__type == HIDItemtype.LOCALITEM):
@@ -78,7 +84,6 @@ class ShortItem():
         else:
             raise ValueError()
 
-    
     # 将int值限定到0、1、2、4字节范围中，取最小的
     def shortest_size(self, intvalue:int):
         assert(isinstance(intvalue, (int)))
@@ -95,8 +100,35 @@ class ShortItem():
     
     def getname(self):
         return self.__item.name
+    
+    def __getbitsize(self):
+        if(self.bitcount == 0):
+            __size = 0
+        elif(self.bitcount <= 8):
+            __size = 1
+        elif(self.bitcount <= 16):
+            __size = 2
+        elif(self.bitcount <= 32):
+            __size = 4
+        else:
+            __size = 4
+            print('DataInvaild!')
+        return __size
 
-    def __call__(self, arg:Union[int, bytes, Callable] = 0):
+    def __datamainitemcall(self, *arg:Tuple[__BitSetCallable]):
+        self.bitvalues = 0
+        self.bitcount = 0
+        if(isinstance(arg, tuple)):
+            for i in range(len(arg)):
+                caller = arg[i]
+                caller(self)
+        __size = self.__getbitsize()
+        __arg = self.bitvalues
+        __data = __arg.to_bytes(length=__size, byteorder='little')
+        __tag_v = self.__item | __size
+        return __tag_v.to_bytes(length=1) + __data
+
+    def __otheritemcall(self, arg:Union[int, bytes, Callable] = 0):
         if(callable(arg)):
             arg = arg()
         if(isinstance(arg, bytes)):
@@ -104,22 +136,133 @@ class ShortItem():
             __size = len(__data)
         else:
             __size = self.shortest_size(arg)
-            print(__size)
             __signed = False
             if(arg  < 0):
                 __signed = True
             __data = arg.to_bytes(length=__size, byteorder='little', signed=__signed)
         __tag_v = self.__item | __size
         return __tag_v.to_bytes(length=1, byteorder='little') + __data
+
+    def __call__(self, *arg):
+        if(self.__datamainitem):
+            return self.__datamainitemcall(*arg)
+        else:
+            return self.__otheritemcall(*arg)
     
     def __eq__(self, value):
-        if(type(value) != type(self)):
+        if(type(value).__name__ != type(self).__name__):
             return False
         return self.__item == value.__item
+
+# Mainitem的Input/Output/Feature使用的位类型的参数定义
+class __BitPart(IntEnum):
+    # Bit0
+    Data            = 0
+    Constant        = 1
+    # Bit1
+    Array           = 0
+    Variable        = 1
+    # Bit2
+    Absolute        = 0
+    Relative        = 1
+    # Bit3
+    NoWrap          = 0
+    Wrap            = 1
+    # Bit4
+    Linear          = 0
+    Nonlinear       = 1
+    # Bit5
+    PreferredState  = 0
+    NoPreferred     = 1
+    # Bit6
+    NoNullPosition  = 0
+    NullState       = 1
+    # Bit7
+    Reserved        = 0 # Input Item
+    Nonvolatile     = 0 # Feature or Output
+    Volatile        = 1
+    # Bit8
+    BitField        = 0
+    BufferedBytes   = 1
+
+class __BitSetCallable:
+    def __init__(self, bitvalue:__BitPart, bitpos:int):
+        self.__bit = bitvalue
+        self.__pos = bitpos
+    
+    def __call__(self, obj:ShortItem):
+        if(self.__pos + 1 > obj.bitcount):
+            obj.bitcount = self.__pos + 1
+        if(self.__bit == 1):
+            obj.bitvalues = obj.bitvalues | (1 << self.__pos)
+        elif(self.__bit == 0):
+            obj.bitvalues = obj.bitvalues & ~(1 << self.__pos)
+
+Data = __BitSetCallable(__BitPart.Data, 0)
+Constant = __BitSetCallable(__BitPart.Constant, 0)
+
+Array = __BitSetCallable(__BitPart.Array, 1)
+Variable = __BitSetCallable(__BitPart.Variable, 1)
+
+Absolute = __BitSetCallable(__BitPart.Absolute, 2)
+Relative = __BitSetCallable(__BitPart.Relative, 2)
+
+NoWrap = __BitSetCallable(__BitPart.NoWrap, 3)
+Wrap = __BitSetCallable(__BitPart.Wrap, 3)
+
+Linear = __BitSetCallable(__BitPart.Linear, 4)
+Nonlinear = __BitSetCallable(__BitPart.Nonlinear, 4)
+
+PreferredState = __BitSetCallable(__BitPart.PreferredState, 5)
+NoPreferred = __BitSetCallable(__BitPart.NoPreferred, 5)
+
+NoNullPosition = __BitSetCallable(__BitPart.NoNullPosition, 6)
+NullState = __BitSetCallable(__BitPart.NullState, 6)
+
+Reserved = __BitSetCallable(__BitPart.Reserved, 7)
+Nonvolatile = __BitSetCallable(__BitPart.Nonvolatile, 7)
+Volatile = __BitSetCallable(__BitPart.Volatile, 7)
+
+BitField = __BitSetCallable(__BitPart.BitField, 8)
+BufferedBytes = __BitSetCallable(__BitPart.BufferedBytes, 8)
+
+# MainItem
+Input = ShortItem(Mainitem.Input)
+Output = ShortItem(Mainitem.Output)
+Feature = ShortItem(Mainitem.Featrue)
+Collection = ShortItem(Mainitem.Collection)
+EndCollection = ShortItem(Mainitem.EndCollection)
+
+# GlobalItem
+UsagePage = ShortItem(Globalitem.UsagePage)
+LogicalMinimum = ShortItem(Globalitem.LogicalMinimum)
+LogicalMaximum = ShortItem(Globalitem.LogicalMaximum)
+PhysicalMinimum = ShortItem(Globalitem.PhysicalMinimum)
+PhysicalMaximum = ShortItem(Globalitem.PhysicalMaximum)
+UnitExponent = ShortItem(Globalitem.UnitExponent)
+Unit = ShortItem(Globalitem.Unit)
+ReportSize = ShortItem(Globalitem.ReportSize)
+ReportID = ShortItem(Globalitem.ReportID)
+ReportCount = ShortItem(Globalitem.ReportCount)
+Push = ShortItem(Globalitem.Push)
+Pop = ShortItem(Globalitem.Pop)
+
+# LocalItem
+Usage = ShortItem(Localitem.Usage)
+UsageMinimum = ShortItem(Localitem.UsageMinimum)
+UsageMaximum = ShortItem(Localitem.UsageMaximum)
+DesignatorIndex = ShortItem(Localitem.DesignatorIndex)
+DesignatorMinimum = ShortItem(Localitem.DesignatorMinimum)
+DesignatorMaximum = ShortItem(Localitem.DesignatorMaximum)
+StringIndex = ShortItem(Localitem.StringIndex)
+StringMinimum = ShortItem(Localitem.StringMinimum)
+StringMaximum = ShortItem(Localitem.StringMaximum)
+Delimiter = ShortItem(Localitem.Delimiter)
 
 if __name__ == '__main__':
     Collection = ShortItem(Mainitem.Collection)
     EndCollection = ShortItem(Mainitem.EndCollection)
     print(Collection(0x0aff))
-    print(Collection(Collection(Collection(0x121212))))
     print(EndCollection())
+    Input = ShortItem(Mainitem.Input)
+    print(Input(Data, Variable, Absolute))
