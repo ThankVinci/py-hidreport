@@ -2,7 +2,7 @@ from __future__ import annotations # 延迟类型解析, 使得包内一些__私
 from enum import IntEnum
 from typing import Union, Callable, Tuple
 
-__all__ = []
+# __all__ = ['Mainitem', 'Globalitem', '']
 
 class Mainitem(IntEnum):
     Input           = 0b10000000 # 最后两位按实际的来
@@ -144,11 +144,12 @@ class ShortItem():
         __tag_v = self.__item | __size
         return __tag_v.to_bytes(length=1, byteorder='little') + __data
 
-    def __call__(self, *arg):
-        if(self.__datamainitem):
-            return self.__datamainitemcall(*arg)
-        else:
+    def __call__(self, *arg:tuple):
+        if(not self.__datamainitem or (len(arg) == 1 and not callable(arg[0]))):
             return self.__otheritemcall(*arg)
+        else:
+            return self.__datamainitemcall(*arg)
+            
     
     def __eq__(self, value):
         if(type(value).__name__ != type(self).__name__):

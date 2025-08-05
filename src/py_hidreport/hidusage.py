@@ -12,43 +12,7 @@ if __name__ == '__main__':
 '''
 Items
 '''
-from py_hidreport.Items import ShortItem
-from py_hidreport.Items import Mainitem, Globalitem, Localitem, CollectionitemType
-# from py_hidreport.items.Main import Data, Variable, Absolute
-
-
-# MainItem
-Input = ShortItem(Mainitem.Input)
-Output = ShortItem(Mainitem.Output)
-Feature = ShortItem(Mainitem.Featrue)
-Collection = ShortItem(Mainitem.Collection)
-EndCollection = ShortItem(Mainitem.EndCollection)
-
-# GlobalItem
-UsagePage = ShortItem(Globalitem.UsagePage)
-LogicalMinimum = ShortItem(Globalitem.LogicalMinimum)
-LogicalMaximum = ShortItem(Globalitem.LogicalMaximum)
-PhysicalMinimum = ShortItem(Globalitem.PhysicalMinimum)
-PhysicalMaximum = ShortItem(Globalitem.PhysicalMaximum)
-UnitExponent = ShortItem(Globalitem.UnitExponent)
-Unit = ShortItem(Globalitem.Unit)
-ReportSize = ShortItem(Globalitem.ReportSize)
-ReportID = ShortItem(Globalitem.ReportID)
-ReportCount = ShortItem(Globalitem.ReportCount)
-Push = ShortItem(Globalitem.Push)
-Pop = ShortItem(Globalitem.Pop)
-
-# LocalItem
-Usage = ShortItem(Localitem.Usage)
-UsageMinimum = ShortItem(Localitem.UsageMinimum)
-UsageMaximum = ShortItem(Localitem.UsageMaximum)
-DesignatorIndex = ShortItem(Localitem.DesignatorIndex)
-DesignatorMinimum = ShortItem(Localitem.DesignatorMinimum)
-DesignatorMaximum = ShortItem(Localitem.DesignatorMaximum)
-StringIndex = ShortItem(Localitem.StringIndex)
-StringMinimum = ShortItem(Localitem.StringMinimum)
-StringMaximum = ShortItem(Localitem.StringMaximum)
-Delimiter = ShortItem(Localitem.Delimiter)
+from py_hidreport.Items import *
 
 '''
 Pages
