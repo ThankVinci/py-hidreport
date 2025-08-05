@@ -12,8 +12,8 @@ if __name__ == '__main__':
 '''
 Items
 '''
-from py_hidreport.items import ShortItem
-from py_hidreport.items import Mainitem, Globalitem, Localitem, CollectionitemType
+from py_hidreport.Items import ShortItem
+from py_hidreport.Items import Mainitem, Globalitem, Localitem, CollectionitemType
 # from py_hidreport.items.Main import Data, Variable, Absolute
 
 
@@ -174,7 +174,6 @@ GamingDevice = Page(UsagePages.GamingDevice)
 FIDOAlliance = Page(UsagePages.FIDOAlliance)
 VendordefinedFF01 = Page(UsagePages.Vendordefined(0xFF01))
 
-from items import *
 # 状态机
 
 def main():

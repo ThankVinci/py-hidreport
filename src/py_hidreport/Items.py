@@ -73,6 +73,7 @@ class ShortItem():
     def __init__(self, item:Union[Mainitem, Globalitem, Localitem], datamainitem = False):
         self.bitvalues = 0
         self.bitcount = 0
+        self.__datamainitem = False
         __type = HIDItemtype(item & HIDItemtype.ITEMMASKS)
         if(__type == HIDItemtype.MAINITEM):
             self.__item = Mainitem(item)

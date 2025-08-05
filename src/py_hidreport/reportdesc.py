@@ -17,7 +17,7 @@ if __name__ == '__main__':
 # 报告描述符状态机
 # 可以检查和添加一行描述符，如果描述符不符合规则则报错
 
-from py_hidreport.items import ShortItem, HIDItemsize
+from py_hidreport.Items import ShortItem, HIDItemsize
 from py_hidreport.pages import Pages
 from py_hidreport.hidusage import UsagePages
 from py_hidreport.hidusage import *
@@ -91,7 +91,7 @@ def main():
 if __name__ == '__main__':
     decoder = ReportDescDecoder()
     context = decoder.decode(b'\x05\x01\x09\x06\xA1\x01\x05\x07\x19\xE0\x29\xE7\x15\x00\x25\x01\x75\x01\x95\x08\x81\x02\x95\x01\x75\x08\x81\x03\x95\x05\x75\x01\x05\x08\x19\x01\x29\x05\x91\x02\x95\x01\x75\x03\x91\x03\x95\x06\x75\x08\x15\x00\x25\x65\x05\x07\x19\x00\x29\x65\x81\x00\xC0')
-    exec(context)
+    # exec(context)
     # eval(context)
     # print(context)
     UsagePage(0x1)
@@ -113,10 +113,10 @@ if __name__ == '__main__':
     UsagePage(0x8)
     UsageMinimum(0x1)
     UsageMaximum(0x5)
-    Output(0x2)
+    # Output(0x2)
     ReportCount(0x1)
     ReportSize(0x3)
-    Output(0x3)
+    # Output(0x3)
     ReportCount(0x6)
     ReportSize(0x8)
     LogicalMinimum(0x0)
