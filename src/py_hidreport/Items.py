@@ -2,7 +2,15 @@ from __future__ import annotations # 延迟类型解析, 使得包内一些__私
 from enum import IntEnum
 from typing import Union, Callable, Tuple
 
-# __all__ = ['Mainitem', 'Globalitem', '']
+__all__ = ['Mainitem', 'Globalitem', 'Localitem', 'CollectionitemType', 'HIDItemsize', 'ShortItem', 
+           'Data', 'Array', 'Variable', 'Absolute', 'Relative', 'NoWrap', 'Wrap', 'Linear', 'Nonlinear',
+           'PreferredState', 'NoPreferred', 'NoNullPosition', 'NullState', 'Nonvolatile', 'Volatile',
+           'BitField', 'BufferedBytes',
+           'Input', 'Output', 'Feature', 'Collection', 'EndCollection', 
+           'UsagePage', 'LogicalMinimum', 'LogicalMaximum', 'PhysicalMinimum', 'PhysicalMaximum', 
+           'UnitExponent', 'Unit', 'ReportSize', 'ReportID', 'ReportCount', 'Push', 'Pop', 
+           'Usage', 'UsageMinimum', 'UsageMaximum', 'DesignatorIndex', 'DesignatorMinimum', 'DesignatorMaximum',
+           'StringIndex', 'StringMinimum', 'StringMaximum', 'Delimiter' ]
 
 class Mainitem(IntEnum):
     Input           = 0b10000000 # 最后两位按实际的来
