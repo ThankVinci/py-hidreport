@@ -33,7 +33,6 @@ class ReportDescDecoder:
     
     def decode(self, buff:bytes):
         idx = 0
-        print(len(buff))
         current_page = UsagePages.Undefined # 当前的用例页
         context = ''
         while(idx < len(buff)):
@@ -48,14 +47,15 @@ class ReportDescDecoder:
             data = int.from_bytes(buff[idx:idx+size], byteorder='little')
             line = f'{item.getname()}'
             if(current_page != UsagePages.Undefined and item == Usage):
-                line += f'({Pages[current_page](data).name})'
+                args = f'({Pages[current_page](data).name})'
             else:
-                line += f'({hex(data)})'
-            # print(current_page.name)
-            # print(item)
-            # print(UsagePage)
+                args = f'({hex(data)})'
             if(item == UsagePage):
                 current_page = UsagePages(data)
+                args = f'({current_page.name})'
+            if(size == 0):
+                args = '()'
+            line += args
             idx += size
             context += line
             context += '\n'
