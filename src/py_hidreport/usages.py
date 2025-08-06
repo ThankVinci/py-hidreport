@@ -9,15 +9,6 @@ if __name__ == '__main__':
     print(root_path)
     sys.path.append(root_path)
 
-'''
-Items
-'''
-from py_hidreport.Items import *
-
-'''
-Pages
-'''
-
 from pages import *
 
 class UsagePages(IntEnum):
@@ -137,45 +128,3 @@ Arcade = Page(UsagePages.Arcade)
 GamingDevice = Page(UsagePages.GamingDevice)
 FIDOAlliance = Page(UsagePages.FIDOAlliance)
 VendordefinedFF01 = Page(UsagePages.Vendordefined(0xFF01))
-
-# 状态机
-
-def main():
-    print(UsagePages.Vendordefined(0xFF01).name)
-    print(ButtonPage.Button(5).name)
-    print(OrdinalPage.Instance(4).name)
-    print(type(UsagePages(UsagePages.Vendordefined(0xFF01))) == UsagePages)
-    print(type(Mainitem(0b10000000)) == Mainitem)
-    print(UsagePage(GenericDesktop))
-    print(Usage(GenericDesktopPage.Mouse))
-    print(Collection(CollectionitemType.Application))
-
-    UsagePage(GenericDesktop)
-    Usage(GenericDesktopPage.Mouse)
-    Collection(CollectionitemType.Application)
-    Usage(GenericDesktopPage.Pointer)
-    Collection(CollectionitemType.Physical)
-    UsageMinimum(1)
-    UsageMaximum(3)
-    LogicalMinimum(0)
-    LogicalMaximum(1)
-    ReportCount(3)
-    ReportSize(1)
-    Input(Data, Variable, Absolute)
-    ReportCount(1)
-    ReportSize(5)
-    # Input(Constant)
-    UsagePage(GenericDesktop)
-    Usage(GenericDesktopPage.X)
-    Usage(GenericDesktopPage.Y)
-    print(LogicalMinimum(-127))
-    print(LogicalMaximum(127))
-    ReportSize(8)
-    ReportCount(2)
-    Input(Data, Variable, Relative)
-    EndCollection()
-    EndCollection()
-
-if __name__ == '__main__':
-    # main()
-    ...

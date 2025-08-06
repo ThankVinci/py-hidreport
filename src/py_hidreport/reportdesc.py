@@ -17,8 +17,8 @@ if __name__ == '__main__':
 # 报告描述符状态机
 # 可以检查和添加一行描述符，如果描述符不符合规则则报错
 
-from py_hidreport.Items import *
-from py_hidreport.hidusage import *
+from py_hidreport.items import *
+from py_hidreport.usages import *
 from py_hidreport.pages import Pages
 
 class ReportDescState(IntEnum):
