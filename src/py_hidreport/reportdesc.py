@@ -31,7 +31,7 @@ class ReportDescParser:
             if(bTagType == 0):
                 print('error')
                 break
-            item = ShortItem(bTagType)
+            item = ShortItems[bTagType]
             bSize = buff[idx] & 0x03
             size = HIDItemsize[bSize]
             idx += 1

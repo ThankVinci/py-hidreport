@@ -2,7 +2,7 @@ from __future__ import annotations # 延迟类型解析, 使得包内一些__私
 from enum import IntEnum
 from typing import Union, Callable, Tuple
 
-__all__ = ['Mainitem', 'Globalitem', 'Localitem', 'CollectionitemType', 'HIDItemsize', 'ShortItem', 
+__all__ = ['Mainitem', 'Globalitem', 'Localitem', 'CollectionitemType', 'HIDItemsize', 'ShortItems', 
            'Data', 'Array', 'Variable', 'Absolute', 'Relative', 'NoWrap', 'Wrap', 'Linear', 'Nonlinear',
            'PreferredState', 'NoPreferred', 'NoNullPosition', 'NullState', 'Nonvolatile', 'Volatile',
            'BitField', 'BufferedBytes',
@@ -15,7 +15,7 @@ __all__ = ['Mainitem', 'Globalitem', 'Localitem', 'CollectionitemType', 'HIDItem
 class Mainitem(IntEnum):
     Input           = 0b10000000 # 最后两位按实际的来
     Output          = 0b10010000 # 最后两位按实际的来
-    Featrue         = 0b10110000 # 最后两位按实际的来
+    Feature         = 0b10110000 # 最后两位按实际的来
     Collection      = 0b10100000 # 最后两位按实际的来
     EndCollection   = 0b11000000 # 最后两位按实际的来
 
@@ -77,6 +77,8 @@ class HIDItemtype(IntEnum):
 
 HIDItemsize = (0, 1, 2, 4) # bSize对应的ItemSize
 
+ShortItems = {}
+
 class ShortItem():
     def __init__(self, item:Union[Mainitem, Globalitem, Localitem], datamainitem = False):
         self.bitvalues = 0
@@ -92,6 +94,7 @@ class ShortItem():
             self.__item = Localitem(item)
         else:
             raise ValueError()
+        ShortItems[self.__item] = self
 
     # 将int值限定到0、1、2、4字节范围中，取最小的
     def shortest_size(self, intvalue:int):
@@ -236,10 +239,14 @@ Volatile = __BitSetCallable(__BitPart.Volatile, 7)
 BitField = __BitSetCallable(__BitPart.BitField, 8)
 BufferedBytes = __BitSetCallable(__BitPart.BufferedBytes, 8)
 
+'''
+ShortItems
+'''
+
 # MainItem
 Input = ShortItem(Mainitem.Input)
 Output = ShortItem(Mainitem.Output)
-Feature = ShortItem(Mainitem.Featrue)
+Feature = ShortItem(Mainitem.Feature)
 Collection = ShortItem(Mainitem.Collection)
 EndCollection = ShortItem(Mainitem.EndCollection)
 
