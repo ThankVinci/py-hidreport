@@ -98,8 +98,11 @@ class ShortItem():
             raise ValueError()
         ShortItems[self.__item] = self
 
+    def name(self):
+        return self.__item.name
+
     # 将int值限定到0、1、2、4字节范围中，取最小的
-    def shortest_size(self, intvalue:int):
+    def __shortest_size(self, intvalue:int):
         assert(isinstance(intvalue, (int)))
         if(intvalue == 0):
             return 0
@@ -111,9 +114,6 @@ class ShortItem():
             return 4
         else:
             return 4
-    
-    def getname(self):
-        return self.__item.name
     
     def __getbitsize(self):
         if(self.bitcount == 0):
@@ -155,7 +155,7 @@ class ShortItem():
             __data = arg.rjust(4, b'\x00') if len(arg) == 3 else arg[:4] # 如果3字节就对齐到4字节, 其他情况下就[:4], 超过4字节会截断, 使得始终为1、2、4字节
             __size = len(__data)
         else:
-            __size = self.shortest_size(arg)
+            __size = self.__shortest_size(arg)
             __signed = False
             if(arg  < 0):
                 __signed = True
@@ -164,7 +164,7 @@ class ShortItem():
         return __tag_v.to_bytes(length=1, byteorder='little') + __data
 
     def __call__(self, *arg:tuple):
-        if(not self.__mainitem or (len(arg) == 1 and not callable(arg[0]))):
+        if(not self.__mainitem or len(arg) == 0 or (len(arg) == 1 and not callable(arg[0]))):
             return self.__otheritemcall(*arg)
         else:
             return self.__mainitemcall(*arg)

@@ -36,7 +36,7 @@ class ReportDescParser:
             size = HIDItemsize[bSize]
             idx += 1
             data = int.from_bytes(buff[idx:idx+size], byteorder='little')
-            line = f'{item.getname()}'
+            line = f'{item.name()}'
             args = '()'
             if(size > 0):
                 args = f'({hex(data)})'
