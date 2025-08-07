@@ -24,7 +24,7 @@ from py_hidreport.pages import Pages
 class ReportDescParser:
     def parse(buff:bytes):
         idx = 0
-        current_page = UsagePages.Undefined # 当前的用例页
+        current_page = Undefined # 当前的用例页
         context = ''
         while(idx < len(buff)):
             bTagType = buff[idx] & 0xfc
@@ -40,11 +40,11 @@ class ReportDescParser:
             args = '()'
             if(size > 0):
                 args = f'({hex(data)})'
-                if(current_page != UsagePages.Undefined and item == Usage):
-                    args = f'({Pages[current_page](data).name})'
+                if(current_page != Undefined and item == Usage):
+                    args = f'({current_page.usage(data)})'
                 if(item == UsagePage):
-                    current_page = UsagePages(data)
-                    args = f'({current_page.name})'
+                    current_page = Page(data)
+                    args = f'({UsagePages(data).name})'
             line += args
             idx += size
             context += line

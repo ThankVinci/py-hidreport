@@ -87,10 +87,17 @@ class UsagePages(IntEnum):
 class Page():
     def __init__(self, page):
         self.__page = page
+    
     def __call__(self):
         __page_v = self.__page
         return bytes(__page_v)
 
+    def usage(self, usage_v):
+        return Pages[self.__page](usage_v).name
+        # return usage_v
+
+
+Undefined = Page(UsagePages.Undefined)
 GenericDesktop = Page(UsagePages.GenericDesktop)
 SimulationControls = Page(UsagePages.SimulationControls)
 VRControls = Page(UsagePages.VRControls)
