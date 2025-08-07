@@ -2,7 +2,7 @@ from __future__ import annotations # 延迟类型解析, 使得包内一些__私
 from enum import IntEnum
 from typing import Union, Callable, Tuple
 
-__all__ = ['Mainitem', 'Globalitem', 'Localitem', 'CollectionitemType', 'HIDItemsize', 'ShortItems', 
+__all__ = ['CollectionitemType', 'HIDItemsize', 'ShortItems', 
            'Data', 'Array', 'Variable', 'Absolute', 'Relative', 'NoWrap', 'Wrap', 'Linear', 'Nonlinear',
            'PreferredState', 'NoPreferred', 'NoNullPosition', 'NullState', 'Nonvolatile', 'Volatile',
            'BitField', 'BufferedBytes',
@@ -80,14 +80,16 @@ HIDItemsize = (0, 1, 2, 4) # bSize对应的ItemSize
 ShortItems = {}
 
 class ShortItem():
-    def __init__(self, item:Union[Mainitem, Globalitem, Localitem], datamainitem = False):
+    def __init__(self, item:Union[Mainitem, Globalitem, Localitem]):
         self.bitvalues = 0
         self.bitcount = 0
-        self.__datamainitem = False
+        self.__mainitem = False
+        self.__collection= False
         __type = HIDItemtype(item & HIDItemtype.ITEMMASKS)
         if(__type == HIDItemtype.MAINITEM):
             self.__item = Mainitem(item)
-            self.__datamainitem = self.__item < Mainitem.Collection
+            self.__mainitem = True
+            self.__collection = self.__item >= Mainitem.Collection
         elif(__type == HIDItemtype.GLOBALITEM):
             self.__item = Globalitem(item)
         elif(__type == HIDItemtype.LOCALITEM):
@@ -127,7 +129,13 @@ class ShortItem():
             print('DataInvaild!')
         return __size
 
-    def __datamainitemcall(self, *arg:Tuple[__BitSetCallable]):
+    def __collectionitemcall(self, *arg):
+        self.__otheritemcall(*arg)
+
+
+    def __mainitemcall(self, *arg:Tuple[__BitSetCallable]):
+        if(self.__collection):
+            return self.__collectionitemcall(*arg)
         self.bitvalues = 0
         self.bitcount = 0
         if(isinstance(arg, tuple)):
@@ -156,10 +164,10 @@ class ShortItem():
         return __tag_v.to_bytes(length=1, byteorder='little') + __data
 
     def __call__(self, *arg:tuple):
-        if(not self.__datamainitem or (len(arg) == 1 and not callable(arg[0]))):
+        if(not self.__mainitem or (len(arg) == 1 and not callable(arg[0]))):
             return self.__otheritemcall(*arg)
         else:
-            return self.__datamainitemcall(*arg)
+            return self.__mainitemcall(*arg)
             
     
     def __eq__(self, value):
