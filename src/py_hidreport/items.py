@@ -2,10 +2,11 @@ from __future__ import annotations # 延迟类型解析, 使得包内一些__私
 from enum import IntEnum
 from typing import Union, Callable, Tuple
 
-__all__ = ['CollectionitemType', 'HIDItemsize', 'ShortItems', 
+__all__ = ['HIDItemsize', 'ShortItems', 'MainitemCollectionPart', 
            'Data', 'Array', 'Variable', 'Absolute', 'Relative', 'NoWrap', 'Wrap', 'Linear', 'Nonlinear',
            'PreferredState', 'NoPreferred', 'NoNullPosition', 'NullState', 'Nonvolatile', 'Volatile',
            'BitField', 'BufferedBytes',
+           'Physical', 'Application', 'Logical', 'Report', 'NamedArray', 'UsageSwitch', 'UsageModifier',
            'Input', 'Output', 'Feature', 'Collection', 'EndCollection', 
            'UsagePage', 'LogicalMinimum', 'LogicalMaximum', 'PhysicalMinimum', 'PhysicalMaximum', 
            'UnitExponent', 'Unit', 'ReportSize', 'ReportID', 'ReportCount', 'Push', 'Pop', 
@@ -53,20 +54,6 @@ class Localitem(IntEnum):
     
     Reserved_Begin      = 0b10101000 # 最后两位按实际的来
     Reserved_End        = 0b11111000 # 最后两位按实际的来
-
-class CollectionitemType(IntEnum):
-    Physical                = 0x00 # group of axes
-    Application             = 0x01 # mouse keyboard
-    Logical                 = 0x02 # interrelated data
-    Report                  = 0x03
-    NamedArray              = 0x04
-    UsageSwitch             = 0x05
-    UsageModifier           = 0x06
-
-    Reserved_Begin          = 0x07
-    Reserved_End            = 0x7F
-    Vendor_defined_Begin    = 0x80
-    Vendor_defined_End      = 0xFF
 
 class HIDItemtype(IntEnum):
     MAINITEM    = 0b00000000
@@ -130,10 +117,10 @@ class ShortItem():
         return __size
 
     def __collectionitemcall(self, *arg):
-        self.__otheritemcall(*arg)
+        return self.__otheritemcall(*arg)
 
 
-    def __mainitemcall(self, *arg:Tuple[__BitSetCallable]):
+    def __mainitemcall(self, *arg:Tuple[MainitemBitSetCallable]):
         if(self.__collection):
             return self.__collectionitemcall(*arg)
         self.bitvalues = 0
@@ -176,7 +163,7 @@ class ShortItem():
         return self.__item == value.__item
 
 # Mainitem的Input/Output/Feature使用的位类型的参数定义
-class __BitPart(IntEnum):
+class MainitemBitPart(IntEnum):
     # Bit0
     Data            = 0
     Constant        = 1
@@ -206,8 +193,8 @@ class __BitPart(IntEnum):
     BitField        = 0
     BufferedBytes   = 1
 
-class __BitSetCallable:
-    def __init__(self, bitvalue:__BitPart, bitpos:int):
+class MainitemBitSetCallable:
+    def __init__(self, bitvalue:MainitemBitPart, bitpos:int):
         self.__bit = bitvalue
         self.__pos = bitpos
     
@@ -219,33 +206,63 @@ class __BitSetCallable:
         elif(self.__bit == 0):
             obj.bitvalues = obj.bitvalues & ~(1 << self.__pos)
 
-Data = __BitSetCallable(__BitPart.Data, 0)
-Constant = __BitSetCallable(__BitPart.Constant, 0)
+Data = MainitemBitSetCallable(MainitemBitPart.Data, 0)
+Constant = MainitemBitSetCallable(MainitemBitPart.Constant, 0)
 
-Array = __BitSetCallable(__BitPart.Array, 1)
-Variable = __BitSetCallable(__BitPart.Variable, 1)
+Array = MainitemBitSetCallable(MainitemBitPart.Array, 1)
+Variable = MainitemBitSetCallable(MainitemBitPart.Variable, 1)
 
-Absolute = __BitSetCallable(__BitPart.Absolute, 2)
-Relative = __BitSetCallable(__BitPart.Relative, 2)
+Absolute = MainitemBitSetCallable(MainitemBitPart.Absolute, 2)
+Relative = MainitemBitSetCallable(MainitemBitPart.Relative, 2)
 
-NoWrap = __BitSetCallable(__BitPart.NoWrap, 3)
-Wrap = __BitSetCallable(__BitPart.Wrap, 3)
+NoWrap = MainitemBitSetCallable(MainitemBitPart.NoWrap, 3)
+Wrap = MainitemBitSetCallable(MainitemBitPart.Wrap, 3)
 
-Linear = __BitSetCallable(__BitPart.Linear, 4)
-Nonlinear = __BitSetCallable(__BitPart.Nonlinear, 4)
+Linear = MainitemBitSetCallable(MainitemBitPart.Linear, 4)
+Nonlinear = MainitemBitSetCallable(MainitemBitPart.Nonlinear, 4)
 
-PreferredState = __BitSetCallable(__BitPart.PreferredState, 5)
-NoPreferred = __BitSetCallable(__BitPart.NoPreferred, 5)
+PreferredState = MainitemBitSetCallable(MainitemBitPart.PreferredState, 5)
+NoPreferred = MainitemBitSetCallable(MainitemBitPart.NoPreferred, 5)
 
-NoNullPosition = __BitSetCallable(__BitPart.NoNullPosition, 6)
-NullState = __BitSetCallable(__BitPart.NullState, 6)
+NoNullPosition = MainitemBitSetCallable(MainitemBitPart.NoNullPosition, 6)
+NullState = MainitemBitSetCallable(MainitemBitPart.NullState, 6)
 
-Reserved = __BitSetCallable(__BitPart.Reserved, 7)
-Nonvolatile = __BitSetCallable(__BitPart.Nonvolatile, 7)
-Volatile = __BitSetCallable(__BitPart.Volatile, 7)
+Reserved = MainitemBitSetCallable(MainitemBitPart.Reserved, 7)
+Nonvolatile = MainitemBitSetCallable(MainitemBitPart.Nonvolatile, 7)
+Volatile = MainitemBitSetCallable(MainitemBitPart.Volatile, 7)
 
-BitField = __BitSetCallable(__BitPart.BitField, 8)
-BufferedBytes = __BitSetCallable(__BitPart.BufferedBytes, 8)
+BitField = MainitemBitSetCallable(MainitemBitPart.BitField, 8)
+BufferedBytes = MainitemBitSetCallable(MainitemBitPart.BufferedBytes, 8)
+
+# Mainitem的Collection使用的参数定义
+class MainitemCollectionPart(IntEnum):
+    Physical                = 0x00 # group of axes
+    Application             = 0x01 # mouse keyboard
+    Logical                 = 0x02 # interrelated data
+    Report                  = 0x03
+    NamedArray              = 0x04
+    UsageSwitch             = 0x05
+    UsageModifier           = 0x06
+
+    Reserved_Begin          = 0x07
+    Reserved_End            = 0x7F
+    Vendor_defined_Begin    = 0x80
+    Vendor_defined_End      = 0xFF
+
+class MainitemCollectionCallable:
+    def __init__(self, part:MainitemCollectionPart):
+        self.__part = MainitemCollectionPart(part)
+    
+    def __call__(self):
+        return self.__part
+
+Physical = MainitemCollectionCallable(MainitemCollectionPart.Physical)
+Application = MainitemCollectionCallable(MainitemCollectionPart.Application)
+Logical = MainitemCollectionCallable(MainitemCollectionPart.Logical)
+Report = MainitemCollectionCallable(MainitemCollectionPart.Report)
+NamedArray = MainitemCollectionCallable(MainitemCollectionPart.NamedArray)
+UsageSwitch = MainitemCollectionCallable(MainitemCollectionPart.UsageSwitch)
+UsageModifier = MainitemCollectionCallable(MainitemCollectionPart.UsageModifier)
 
 '''
 ShortItems

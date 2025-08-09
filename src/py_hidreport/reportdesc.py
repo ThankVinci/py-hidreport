@@ -45,6 +45,8 @@ class ReportDescParser:
                 if(item == UsagePage):
                     current_page = Page(data)
                     args = f'({UsagePages(data).name})'
+                if(item == Collection):
+                    args = f'({MainitemCollectionPart(data).name})'
             line += args
             idx += size
             context += line
