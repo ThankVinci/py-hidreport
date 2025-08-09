@@ -89,8 +89,14 @@ class Page():
         self.__page = page
     
     def __call__(self):
-        __page_v = self.__page
-        return bytes(__page_v)
+        __page_v = int(self.__page)
+        if(__page_v == 0):
+            return b'\x00'
+        elif(__page_v.bit_length() <= 8):
+            return __page_v.to_bytes(length=1, byteorder='little')
+        elif(__page_v.bit_length() <= 16):
+            return __page_v.to_bytes(length=2, byteorder='little')
+        return __page_v.to_bytes(length=4, byteorder='little')
 
     def usage(self, usage_v):
         return Pages[self.__page](usage_v).name
