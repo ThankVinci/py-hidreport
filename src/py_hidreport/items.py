@@ -2,10 +2,10 @@ from __future__ import annotations # 延迟类型解析, 使得包内一些__私
 from enum import IntEnum
 from typing import Union, Callable, Tuple
 
-__all__ = ['HIDItemsize', 'ShortItems', 'MainitemCollectionPart', 
-           'Data', 'Array', 'Variable', 'Absolute', 'Relative', 'NoWrap', 'Wrap', 'Linear', 'Nonlinear',
-           'PreferredState', 'NoPreferred', 'NoNullPosition', 'NullState', 'Nonvolatile', 'Volatile',
-           'BitField', 'BufferedBytes',
+__all__ = ['HIDItemsize', 'ShortItems', 'MainitemCollectionPart', 'MainitemBitPart', 
+           'Data', 'Constant', 'Array', 'Variable', 'Absolute', 'Relative', 
+           'NoWrap', 'Wrap', 'Linear', 'Nonlinear', 'PreferredState', 'NoPreferred', 
+           'NoNullPosition', 'NullState', 'Nonvolatile', 'Volatile', 'BitField', 'BufferedBytes',
            'Physical', 'Application', 'Logical', 'Report', 'NamedArray', 'UsageSwitch', 'UsageModifier',
            'Input', 'Output', 'Feature', 'Collection', 'EndCollection', 
            'UsagePage', 'LogicalMinimum', 'LogicalMaximum', 'PhysicalMinimum', 'PhysicalMaximum', 
@@ -163,38 +163,65 @@ class ShortItem():
         return self.__item == value.__item
 
 # Mainitem的Input/Output/Feature使用的位类型的参数定义
-class MainitemBitPart(IntEnum):
-    # Bit0
-    Data            = 0
-    Constant        = 1
-    # Bit1
-    Array           = 0
-    Variable        = 1
-    # Bit2
-    Absolute        = 0
-    Relative        = 1
-    # Bit3
-    NoWrap          = 0
-    Wrap            = 1
-    # Bit4
-    Linear          = 0
-    Nonlinear       = 1
-    # Bit5
-    PreferredState  = 0
-    NoPreferred     = 1
-    # Bit6
-    NoNullPosition  = 0
-    NullState       = 1
-    # Bit7
-    Reserved        = 0 # Input Item
-    Nonvolatile     = 0 # Feature or Output
-    Volatile        = 1
-    # Bit8
-    BitField        = 0
-    BufferedBytes   = 1
+class MainitemBitPart:
+    class __Bit0(IntEnum):
+        Data            = 0
+        Constant        = 1
+    class __Bit1(IntEnum):
+        Array           = 0
+        Variable        = 1
+    class __Bit2(IntEnum):
+        Absolute        = 0
+        Relative        = 1
+    class __Bit3(IntEnum):
+        NoWrap          = 0
+        Wrap            = 1
+    class __Bit4(IntEnum):
+        Linear          = 0
+        Nonlinear       = 1
+    class __Bit5(IntEnum):
+        PreferredState  = 0
+        NoPreferred     = 1
+    class __Bit6(IntEnum):
+        NoNullPosition  = 0
+        NullState       = 1
+    class __Bit7(IntEnum):
+        Nonvolatile     = 0 # Input时表示Reserved
+        Volatile        = 1
+    class __Bit8(IntEnum):
+        BitField        = 0
+        BufferedBytes   = 1
+    
+    MainitemBits = {}
+    MainitemBits[0] = __Bit0
+    MainitemBits[1] = __Bit1
+    MainitemBits[2] = __Bit2
+    MainitemBits[3] = __Bit3
+    MainitemBits[4] = __Bit4
+    MainitemBits[5] = __Bit5
+    MainitemBits[6] = __Bit6
+    MainitemBits[7] = __Bit7
+    MainitemBits[8] = __Bit8
+
+    @classmethod
+    def parse(cls, value:int):
+        value = value & 0x1ff
+        __args = ''
+        __cnt = 0
+        for i in range(9):
+            __value = (value >> i) & 1
+            if(__value == 1):
+                if(__cnt == 0):
+                    __args += f'{MainitemBits[i](__value).name}'
+                    __cnt += 1
+                else:
+                    __args += f',{MainitemBits[i](__value).name}'
+        return __args
+
+MainitemBits = MainitemBitPart.MainitemBits
 
 class MainitemBitSetCallable:
-    def __init__(self, bitvalue:MainitemBitPart, bitpos:int):
+    def __init__(self, bitvalue:int, bitpos:int):
         self.__bit = bitvalue
         self.__pos = bitpos
     
@@ -206,33 +233,33 @@ class MainitemBitSetCallable:
         elif(self.__bit == 0):
             obj.bitvalues = obj.bitvalues & ~(1 << self.__pos)
 
-Data = MainitemBitSetCallable(MainitemBitPart.Data, 0)
-Constant = MainitemBitSetCallable(MainitemBitPart.Constant, 0)
+Data = MainitemBitSetCallable(MainitemBits[0].Data, 0)
+Constant = MainitemBitSetCallable(MainitemBits[0].Constant, 0)
 
-Array = MainitemBitSetCallable(MainitemBitPart.Array, 1)
-Variable = MainitemBitSetCallable(MainitemBitPart.Variable, 1)
+Array = MainitemBitSetCallable(MainitemBits[1].Array, 1)
+Variable = MainitemBitSetCallable(MainitemBits[1].Variable, 1)
 
-Absolute = MainitemBitSetCallable(MainitemBitPart.Absolute, 2)
-Relative = MainitemBitSetCallable(MainitemBitPart.Relative, 2)
+Absolute = MainitemBitSetCallable(MainitemBits[2].Absolute, 2)
+Relative = MainitemBitSetCallable(MainitemBits[2].Relative, 2)
 
-NoWrap = MainitemBitSetCallable(MainitemBitPart.NoWrap, 3)
-Wrap = MainitemBitSetCallable(MainitemBitPart.Wrap, 3)
+NoWrap = MainitemBitSetCallable(MainitemBits[3].NoWrap, 3)
+Wrap = MainitemBitSetCallable(MainitemBits[3].Wrap, 3)
 
-Linear = MainitemBitSetCallable(MainitemBitPart.Linear, 4)
-Nonlinear = MainitemBitSetCallable(MainitemBitPart.Nonlinear, 4)
+Linear = MainitemBitSetCallable(MainitemBits[4].Linear, 4)
+Nonlinear = MainitemBitSetCallable(MainitemBits[4].Nonlinear, 4)
 
-PreferredState = MainitemBitSetCallable(MainitemBitPart.PreferredState, 5)
-NoPreferred = MainitemBitSetCallable(MainitemBitPart.NoPreferred, 5)
+PreferredState = MainitemBitSetCallable(MainitemBits[5].PreferredState, 5)
+NoPreferred = MainitemBitSetCallable(MainitemBits[5].NoPreferred, 5)
 
-NoNullPosition = MainitemBitSetCallable(MainitemBitPart.NoNullPosition, 6)
-NullState = MainitemBitSetCallable(MainitemBitPart.NullState, 6)
+NoNullPosition = MainitemBitSetCallable(MainitemBits[6].NoNullPosition, 6)
+NullState = MainitemBitSetCallable(MainitemBits[6].NullState, 6)
 
-Reserved = MainitemBitSetCallable(MainitemBitPart.Reserved, 7)
-Nonvolatile = MainitemBitSetCallable(MainitemBitPart.Nonvolatile, 7)
-Volatile = MainitemBitSetCallable(MainitemBitPart.Volatile, 7)
+Reserved = MainitemBitSetCallable(MainitemBits[7].Nonvolatile, 7)
+Nonvolatile = MainitemBitSetCallable(MainitemBits[7].Nonvolatile, 7)
+Volatile = MainitemBitSetCallable(MainitemBits[7].Volatile, 7)
 
-BitField = MainitemBitSetCallable(MainitemBitPart.BitField, 8)
-BufferedBytes = MainitemBitSetCallable(MainitemBitPart.BufferedBytes, 8)
+BitField = MainitemBitSetCallable(MainitemBits[8].BitField, 8)
+BufferedBytes = MainitemBitSetCallable(MainitemBits[8].BufferedBytes, 8)
 
 # Mainitem的Collection使用的参数定义
 class MainitemCollectionPart(IntEnum):
