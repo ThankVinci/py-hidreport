@@ -30,12 +30,12 @@ class ReportDescParser:
             args = '()'
             if(size > 0):
                 args = f'({hex(data)})'
-                if(current_page != Undefined and item == Usage):
+                if(item is Usage and not (current_page is Undefined)):
                     args = f'({current_page.usage(data)})'
-                if(item == UsagePage):
+                if(item is UsagePage):
                     current_page = UsagePages[data]
                     args = f'({UsagePages[data].name()})'
-                if(item == Collection):
+                if(item is Collection):
                     args = f'({MainitemCollectionPart(data).name})'
                 if(item in (Input, Output, Feature)):
                     args = f'({MainitemBitPart.parse(data)})'

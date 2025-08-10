@@ -117,13 +117,13 @@ class ShortItem:
         self.__mainitem = False
         self.__collection= False
         __type = HIDItemtype(item & HIDItemtype.ITEMMASKS)
-        if(__type == HIDItemtype.MAINITEM):
+        if(__type is HIDItemtype.MAINITEM):
             self.__item = Mainitem(item)
             self.__mainitem = True
             self.__collection = self.__item in (Mainitem.Collection, Mainitem.EndCollection)
-        elif(__type == HIDItemtype.GLOBALITEM):
+        elif(__type is HIDItemtype.GLOBALITEM):
             self.__item = Globalitem(item)
-        elif(__type == HIDItemtype.LOCALITEM):
+        elif(__type is HIDItemtype.LOCALITEM):
             self.__item = Localitem(item)
         else:
             raise ValueError()
