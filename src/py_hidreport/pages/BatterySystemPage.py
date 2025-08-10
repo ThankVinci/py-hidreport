@@ -67,8 +67,8 @@ class BatterySystemPage(IntEnum):
     AverageTimeToEmpty                      = 0x69
     AverageTimeToFull                       = 0x6A
     CycleCount                              = 0x6B
-    __Reserved3_Begin                       = 0x6C
-    __Reserved3_End                         = 0x7F
+    __Reserved4_Begin                       = 0x6C
+    __Reserved4_End                         = 0x7F
     BatteryPackModelLevel                   = 0x80
     InternalChargeController                = 0x81
     PrimaryBatterySupport                   = 0x82
@@ -85,13 +85,13 @@ class BatterySystemPage(IntEnum):
     CapacityGranularity1                    = 0x8D
     CapacityGranularity2                    = 0x8E
     iOEMInformation                         = 0x8F
-    __Reserved4_Begin                       = 0x90
-    __Reserved4_End                         = 0xBF
+    __Reserved5_Begin                       = 0x90
+    __Reserved5_End                         = 0xBF
     InhibitCharge                           = 0xC0
     EnablePolling                           = 0xC1
     ResetToZero                             = 0xC2
-    __Reserved5_Begin                       = 0xC3
-    __Reserved5_End                         = 0xCF
+    __Reserved6_Begin                       = 0xC3
+    __Reserved6_End                         = 0xCF
     ACPresent                               = 0xD0
     BatteryPresent                          = 0xD1
     PowerFail                               = 0xD2
@@ -105,14 +105,14 @@ class BatterySystemPage(IntEnum):
     CurrentNotRegulated                     = 0xDA
     VoltageNotRegulated                     = 0xDB
     MasterMode                              = 0xDC
-    __Reserved6_Begin                       = 0xDD
-    __Reserved6_End                         = 0xEF
+    __Reserved7_Begin                       = 0xDD
+    __Reserved7_End                         = 0xEF
     ChargerSelectorSupport                  = 0xF0
     ChargerSpec                             = 0xF1
     Level2                                  = 0xF2
     Level3                                  = 0xF3
-    __Reserved7_Begin                       = 0xF4
-    __Reserved7_End                         = 0xFFFF
+    __Reserved8_Begin                       = 0xF4
+    __Reserved8_End                         = 0xFFFF
 
     def to_bytes(self):
         length = 0

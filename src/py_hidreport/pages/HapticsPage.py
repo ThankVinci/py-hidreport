@@ -43,7 +43,7 @@ class HapticsPage(IntEnum):
     __Reserved3_End                         = 0x2000
     ReservedforVendorWaveforms_Begin        = 0x2001
     ReservedforVendorWaveforms_End          = 0x2FFF
-    __Reserved4_End                         = 0x3000
+    __Reserved4_Begin                       = 0x3000
     __Reserved4_End                         = 0xFFFF
 
     def to_bytes(self):
