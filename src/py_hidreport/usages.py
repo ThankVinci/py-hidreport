@@ -9,9 +9,19 @@ if __name__ == '__main__':
     print(root_path)
     sys.path.append(root_path)
 
-from pages import *
+__all__ = ['UsagePages',
+           'Undefined', 'GenericDesktop', 'SimulationControls', 'VRControls', 
+           'SportControls', 'GameControls', 'GenericDeviceControls', 'Keyboard', 'Keypad', 
+           'LED', 'Button', 'Ordinal', 'TelephonyDevice', 'Consumer', 'Digitizers', 'Haptics', 
+           'PhysicalInputDevice', 'Unicode', 'SoC', 'EyeandHeadTrackers', 'AuxiliaryDisplay',
+           'Sensors', 'MedicalInstrument', 'BrailleDisplay', 'LightingAndIllumination',
+           'Monitor', 'MonitorEnumerated', 'VESAVirtualControls', 'Power',
+           'BatterySystem', 'BarcodeScanner', 'Scales', 'MagneticStripeReader', 'CameraControl', 
+           'Arcade', 'GamingDevice', 'FIDOAlliance', 'VendordefinedFF01']
 
-class UsagePages(IntEnum):
+from py_hidreport.pages import *
+
+class UsagePage(IntEnum):
     Undefined                   = 0x00
     GenericDesktop              = GenericDesktopPageId
     SimulationControls          = SimulationControlsPageId
@@ -68,7 +78,7 @@ class UsagePages(IntEnum):
     __Reserved9_END             = 0xFEFF
     Vendordefined_BEGIN         = 0xFF00
     Vendordefined_END           = 0xFFFF
-    Vendordefined               = lambda value:UsagePages(value) # 0xFF00~0xFFFF
+    Vendordefined               = lambda value:UsagePage(value) # 0xFF00~0xFFFF
     
     @classmethod
     def _missing_(cls, value):
@@ -84,10 +94,16 @@ class UsagePages(IntEnum):
             return __pseudo_member
         raise ValueError(f"{value} is not a valid UsagePages")
 
+UsagePages = {}
+
 class Page():
-    def __init__(self, page):
+    def __init__(self, page:UsagePage):
         self.__page = page
+        UsagePages[page] = self
     
+    def name(self):
+        return self.__page.name
+
     def __call__(self):
         __page_v = int(self.__page)
         if(__page_v == 0):
@@ -102,42 +118,41 @@ class Page():
         return Pages[self.__page](usage_v).name
         # return usage_v
 
-
-Undefined = Page(UsagePages.Undefined)
-GenericDesktop = Page(UsagePages.GenericDesktop)
-SimulationControls = Page(UsagePages.SimulationControls)
-VRControls = Page(UsagePages.VRControls)
-SportControls = Page(UsagePages.SportControls)
-GameControls = Page(UsagePages.GameControls)
-GenericDeviceControls = Page(UsagePages.GenericDeviceControls)
-Keyboard = Page(UsagePages.Keyboard)
-Keypad = Page(UsagePages.Keypad)
-LED = Page(UsagePages.LED)
-Button = Page(UsagePages.Button)
-Ordinal = Page(UsagePages.Ordinal)
-TelephonyDevice = Page(UsagePages.TelephonyDevice)
-Consumer = Page(UsagePages.Consumer)
-Digitizers = Page(UsagePages.Digitizers)
-Haptics = Page(UsagePages.Haptics)
-PhysicalInputDevice = Page(UsagePages.PhysicalInputDevice)
-Unicode = Page(UsagePages.Unicode)
-SoC = Page(UsagePages.SoC)
-EyeandHeadTrackers = Page(UsagePages.EyeandHeadTrackers)
-AuxiliaryDisplay = Page(UsagePages.AuxiliaryDisplay)
-Sensors = Page(UsagePages.Sensors)
-MedicalInstrument = Page(UsagePages.MedicalInstrument)
-BrailleDisplay = Page(UsagePages.BrailleDisplay)
-LightingAndIllumination = Page(UsagePages.LightingAndIllumination)
-Monitor = Page(UsagePages.Monitor)
-MonitorEnumerated = Page(UsagePages.MonitorEnumerated)
-VESAVirtualControls = Page(UsagePages.VESAVirtualControls)
-Power = Page(UsagePages.Power)
-BatterySystem = Page(UsagePages.BatterySystem)
-BarcodeScanner = Page(UsagePages.BarcodeScanner)
-Scales = Page(UsagePages.Scales)
-MagneticStripeReader = Page(UsagePages.MagneticStripeReader)
-CameraControl = Page(UsagePages.CameraControl)
-Arcade = Page(UsagePages.Arcade)
-GamingDevice = Page(UsagePages.GamingDevice)
-FIDOAlliance = Page(UsagePages.FIDOAlliance)
-VendordefinedFF01 = Page(UsagePages.Vendordefined(0xFF01))
+Undefined = Page(UsagePage.Undefined)
+GenericDesktop = Page(UsagePage.GenericDesktop)
+SimulationControls = Page(UsagePage.SimulationControls)
+VRControls = Page(UsagePage.VRControls)
+SportControls = Page(UsagePage.SportControls)
+GameControls = Page(UsagePage.GameControls)
+GenericDeviceControls = Page(UsagePage.GenericDeviceControls)
+Keyboard = Page(UsagePage.Keyboard)
+Keypad = Page(UsagePage.Keypad)
+LED = Page(UsagePage.LED)
+Button = Page(UsagePage.Button)
+Ordinal = Page(UsagePage.Ordinal)
+TelephonyDevice = Page(UsagePage.TelephonyDevice)
+Consumer = Page(UsagePage.Consumer)
+Digitizers = Page(UsagePage.Digitizers)
+Haptics = Page(UsagePage.Haptics)
+PhysicalInputDevice = Page(UsagePage.PhysicalInputDevice)
+Unicode = Page(UsagePage.Unicode)
+SoC = Page(UsagePage.SoC)
+EyeandHeadTrackers = Page(UsagePage.EyeandHeadTrackers)
+AuxiliaryDisplay = Page(UsagePage.AuxiliaryDisplay)
+Sensors = Page(UsagePage.Sensors)
+MedicalInstrument = Page(UsagePage.MedicalInstrument)
+BrailleDisplay = Page(UsagePage.BrailleDisplay)
+LightingAndIllumination = Page(UsagePage.LightingAndIllumination)
+Monitor = Page(UsagePage.Monitor)
+MonitorEnumerated = Page(UsagePage.MonitorEnumerated)
+VESAVirtualControls = Page(UsagePage.VESAVirtualControls)
+Power = Page(UsagePage.Power)
+BatterySystem = Page(UsagePage.BatterySystem)
+BarcodeScanner = Page(UsagePage.BarcodeScanner)
+Scales = Page(UsagePage.Scales)
+MagneticStripeReader = Page(UsagePage.MagneticStripeReader)
+CameraControl = Page(UsagePage.CameraControl)
+Arcade = Page(UsagePage.Arcade)
+GamingDevice = Page(UsagePage.GamingDevice)
+FIDOAlliance = Page(UsagePage.FIDOAlliance)
+VendordefinedFF01 = Page(UsagePage.Vendordefined(0xFF01))

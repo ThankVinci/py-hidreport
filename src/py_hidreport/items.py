@@ -88,7 +88,7 @@ class ShortItem():
     def name(self):
         return self.__item.name
 
-    # 将int值限定到0、1、2、4字节范围中，取最小的
+    # 将int值限定到1、2、4字节范围中，取最小的
     def __shortest_size(self, intvalue:int):
         assert(isinstance(intvalue, (int)))
         if(intvalue.bit_length() <= 8):
@@ -113,8 +113,6 @@ class ShortItem():
         return __size
 
     def __collectionitemcall(self, *arg):
-        print(self.__item)
-        print(Mainitem.Collection)
         if(self.__item is Mainitem.Collection):
             return self.__otheritemcall(*arg)
         else:
@@ -159,7 +157,6 @@ class ShortItem():
         else:
             return self.__mainitemcall(*arg)
             
-    
     def __eq__(self, value):
         if(type(value).__name__ != type(self).__name__):
             return False
