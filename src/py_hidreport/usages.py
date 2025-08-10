@@ -115,8 +115,8 @@ class Page():
         return __page_v.to_bytes(length=4, byteorder='little')
 
     def usage(self, usage_v):
-        return Pages[self.__page](usage_v).name
-        # return usage_v
+        __usage = Pages[self.__page](usage_v)
+        return f'{__usage.__class__.__name__}.{__usage.name}'
 
 Undefined = Page(UsagePage.Undefined)
 GenericDesktop = Page(UsagePage.GenericDesktop)
