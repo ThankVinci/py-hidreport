@@ -76,7 +76,7 @@ class ShortItem():
         if(__type == HIDItemtype.MAINITEM):
             self.__item = Mainitem(item)
             self.__mainitem = True
-            self.__collection = self.__item >= Mainitem.Collection
+            self.__collection = self.__item in (Mainitem.Collection, Mainitem.EndCollection)
         elif(__type == HIDItemtype.GLOBALITEM):
             self.__item = Globalitem(item)
         elif(__type == HIDItemtype.LOCALITEM):
@@ -91,9 +91,7 @@ class ShortItem():
     # 将int值限定到0、1、2、4字节范围中，取最小的
     def __shortest_size(self, intvalue:int):
         assert(isinstance(intvalue, (int)))
-        if(intvalue == 0):
-            return 0
-        elif(intvalue.bit_length() <= 8):
+        if(intvalue.bit_length() <= 8):
             return 1
         elif(intvalue.bit_length() <= 16):
             return 2
@@ -103,9 +101,7 @@ class ShortItem():
             return 4
     
     def __getbitsize(self):
-        if(self.bitcount == 0):
-            __size = 0
-        elif(self.bitcount <= 8):
+        if(self.bitcount <= 8):
             __size = 1
         elif(self.bitcount <= 16):
             __size = 2
@@ -117,7 +113,14 @@ class ShortItem():
         return __size
 
     def __collectionitemcall(self, *arg):
-        return self.__otheritemcall(*arg)
+        print(self.__item)
+        print(Mainitem.Collection)
+        if(self.__item is Mainitem.Collection):
+            return self.__otheritemcall(*arg)
+        else:
+            __size = 0
+            __tag_v = self.__item | __size 
+            return __tag_v.to_bytes(length=1)
 
 
     def __mainitemcall(self, *arg:Tuple[MainitemBitSetCallable]):
@@ -151,7 +154,7 @@ class ShortItem():
         return __tag_v.to_bytes(length=1, byteorder='little') + __data
 
     def __call__(self, *arg:tuple):
-        if(not self.__mainitem or len(arg) == 0 or (len(arg) == 1 and not callable(arg[0]))):
+        if(not self.__mainitem or (len(arg) == 1 and not callable(arg[0]))):
             return self.__otheritemcall(*arg)
         else:
             return self.__mainitemcall(*arg)
@@ -329,8 +332,6 @@ StringMaximum = ShortItem(Localitem.StringMaximum)
 Delimiter = ShortItem(Localitem.Delimiter)
 
 if __name__ == '__main__':
-    Collection = ShortItem(Mainitem.Collection)
-    EndCollection = ShortItem(Mainitem.EndCollection)
     print(Collection(0x0aff))
     print(EndCollection())
     Input = ShortItem(Mainitem.Input)
