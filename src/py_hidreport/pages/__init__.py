@@ -15,7 +15,7 @@ from .ConsumerPage import *
 from .DigitizersPage import *
 from .HapticsPage import *
 from .PhysicalInputDevicePage import *
-# from .UnicodePage import *
+from .UnicodePage import *
 from .SoCPage import *
 from .EyeandHeadTrackersPage import *
 from .AuxiliaryDisplayPage import *
@@ -33,7 +33,7 @@ from .ScalesPage import *
 from .MagneticStripeReaderPage import *
 from .CameraControlPage import *
 from .ArcadePage import *
-# from .GamingDevicePage import *
+from .GamingDevicePage import *
 from .FIDOAlliancePage import *
 
 Pages[GenericDesktopPageId]             = GenericDesktopPage
@@ -52,7 +52,7 @@ Pages[ConsumerPageId]                   = ConsumerPage
 Pages[DigitizersPageId]                 = DigitizersPage
 Pages[HapticsPageId]                    = HapticsPage
 Pages[PhysicalInputDevicePageId]        = PhysicalInputDevicePage
-# Pages[UnicodePageId]                    = UnicodePage
+Pages[UnicodePageId]                    = UnicodePage
 Pages[SoCPageId]                        = SoCPage
 Pages[EyeandHeadTrackersPageId]         = EyeandHeadTrackersPage
 Pages[AuxiliaryDisplayPageId]           = AuxiliaryDisplayPage
@@ -70,5 +70,5 @@ Pages[ScalesPageId]                     = ScalesPage
 Pages[MagneticStripeReaderPageId]       = MagneticStripeReaderPage
 Pages[CameraControlPageId]              = CameraControlPage
 Pages[ArcadePageId]                     = ArcadePage
-# Pages[GamingDevicePageId]               = GamingDevicePage
+Pages[GamingDevicePageId]               = GamingDevicePage
 Pages[FIDOAlliancePageId]               = FIDOAlliancePage
