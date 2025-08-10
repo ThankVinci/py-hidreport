@@ -1,4 +1,6 @@
+from __future__ import annotations # 延迟类型解析, 使得包内一些__私有的类型也可以作为另一个类型的参数类型注解, 也可以避免循环引用的问题
 from enum import IntEnum
+from typing import Dict, Type
 
 if __name__ == '__main__':
     # 进行内部调试时会找不到导入的模块，所以手动添加本程序根目录到sys.path中
@@ -39,7 +41,7 @@ class UsagePage(IntEnum):
     Digitizers                  = DigitizersPageId
     Haptics                     = HapticsPageId
     PhysicalInputDevice         = PhysicalInputDevicePageId
-    Unicode                     = 0x10
+    Unicode                     = UnicodePageId
     SoC                         = SoCPageId
     EyeandHeadTrackers          = EyeandHeadTrackersPageId
     __Reserved0                 = 0x13 # 0x13~0x13
@@ -70,7 +72,7 @@ class UsagePage(IntEnum):
     __Reserved7                 = 0x8F # 0x8F~0x8F
     CameraControl               = CameraControlPageId
     Arcade                      = ArcadePageId
-    GamingDevice                = 0x92
+    GamingDevice                = GamingDevicePageId
     __Reserved8_BEGIN           = 0x93 # 0x93~0xF1CF
     __Reserved8_END             = 0xF1CF
     FIDOAlliance                = FIDOAlliancePageId
@@ -91,32 +93,37 @@ class UsagePage(IntEnum):
                 __pseudo_member._value_ = value
                 # 缓存以避免重复创建
                 cls._value2member_map_[value] = __pseudo_member
+                setattr(cls, __pseudo_member._name_, __pseudo_member)
             return __pseudo_member
         raise ValueError(f"{value} is not a valid UsagePages")
+    
+    def to_bytes(self):
+        length = 0
+        if(self.bit_length() <= 8):
+            length = 1
+        elif(self.bit_length() <= 16):
+            length = 2
+        elif(self.bit_length() <= 32):
+            length = 4
+        return super().to_bytes(length=length, byteorder='little', signed=False)
 
-UsagePages = {}
+UsagePages:Dict[UsagePage, Page] = {}
 
 class Page():
     def __init__(self, page:UsagePage):
-        self.__page = page
+        self.__page = UsagePage(page)
         UsagePages[page] = self
     
-    def name(self):
+    def name(self)->str:
         return self.__page.name
 
+    def usage(self, usage_v)->str:
+        __page:Type = Pages[self.__page]
+        __usage:IntEnum = __page(usage_v)
+        return f'{__page.__name__}.{__usage.name}'
+    
     def __call__(self):
-        __page_v = int(self.__page)
-        if(__page_v == 0):
-            return b'\x00'
-        elif(__page_v.bit_length() <= 8):
-            return __page_v.to_bytes(length=1, byteorder='little')
-        elif(__page_v.bit_length() <= 16):
-            return __page_v.to_bytes(length=2, byteorder='little')
-        return __page_v.to_bytes(length=4, byteorder='little')
-
-    def usage(self, usage_v):
-        __usage = Pages[self.__page](usage_v)
-        return f'{__usage.__class__.__name__}.{__usage.name}'
+        return self.__page.to_bytes()
 
 Undefined = Page(UsagePage.Undefined)
 GenericDesktop = Page(UsagePage.GenericDesktop)

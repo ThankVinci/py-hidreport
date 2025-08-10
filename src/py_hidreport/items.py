@@ -2,7 +2,8 @@ from __future__ import annotations # 延迟类型解析, 使得包内一些__私
 from enum import IntEnum
 from typing import Union, Callable, Tuple
 
-__all__ = ['HIDItemsize', 'ShortItems', 'MainitemCollectionPart', 'MainitemBitPart', 
+__all__ = ['HIDItem_size2bSize', 'HIDItem_bSize2Size', 'ItemValue', 'ArgValue', 
+           'ShortItems', 'MainitemCollectionPart', 'MainitemBitPart', 
            'Data', 'Constant', 'Array', 'Variable', 'Absolute', 'Relative', 
            'NoWrap', 'Wrap', 'Linear', 'Nonlinear', 'PreferredState', 'NoPreferred', 
            'NoNullPosition', 'NullState', 'Nonvolatile', 'Volatile', 'BitField', 'BufferedBytes',
@@ -62,14 +63,57 @@ class HIDItemtype(IntEnum):
     __RESERVED  = 0b00001100
     ITEMMASKS    = MAINITEM | GLOBALITEM | LOCALITEM
 
-HIDItemsize = (0, 1, 2, 4) # bSize对应的ItemSize
+HIDItem_size2bSize = {0:0b00, 1:0b01, 2:0b10, 4:0b11}
+HIDItem_bSize2Size = {0b00:0, 0b01:1, 0b10:2, 0b11:4}
+
+class ValueType(int):
+    def __new__(cls, *args:Union[tuple, int]):
+        __value = 0
+        if(isinstance(args, tuple)):
+            # item 与 bSize 分开设置的情况
+            if(len(args) > 0):
+                __item:Union[Mainitem, Globalitem, Localitem] = args[0]
+                __value = __item
+            if(len(args) > 1):
+                __size:int = args[1]
+                __value = __value | HIDItem_size2bSize[__size]
+        elif(isinstance(args, int)):
+            # item整体或者arg值的情况
+            __value = args
+        return super().__new__(cls, __value)
+    
+    def to_bytes(self):
+        length = 0
+        if(self.bit_length() <= 8):
+            length = 1
+        elif(self.bit_length() <= 16):
+            length = 2
+        elif(self.bit_length() <= 32):
+            length = 4
+        signed = False
+        if(self < 0):
+            signed = True
+        return super().to_bytes(length=length, byteorder='little', signed=signed)
+
+ArgValue = ValueType
 
 ShortItems = {}
 
-class ShortItem():
+class ItemValue(ValueType):
+    def bSize(self)->int:
+        return self & 0b11
+    
+    def Item(self)->ShortItem:
+        __item = self & 0b11111100
+        return ShortItems[__item]
+
+    def Size(self)->int:
+        return HIDItem_bSize2Size[self.bSize()]
+
+class ShortItem:
     def __init__(self, item:Union[Mainitem, Globalitem, Localitem]):
-        self.bitvalues = 0
-        self.bitcount = 0
+        self.__bitvalues = 0
+        self.__bitcount = 0
         self.__mainitem = False
         self.__collection= False
         __type = HIDItemtype(item & HIDItemtype.ITEMMASKS)
@@ -85,82 +129,51 @@ class ShortItem():
             raise ValueError()
         ShortItems[self.__item] = self
 
-    def name(self):
+    def name(self)->str:
         return self.__item.name
-
-    # 将int值限定到1、2、4字节范围中，取最小的
-    def __shortest_size(self, intvalue:int):
-        assert(isinstance(intvalue, (int)))
-        if(intvalue.bit_length() <= 8):
-            return 1
-        elif(intvalue.bit_length() <= 16):
-            return 2
-        elif(intvalue.bit_length() <= 32):
-            return 4
-        else:
-            return 4
     
-    def __getbitsize(self):
-        if(self.bitcount <= 8):
-            __size = 1
-        elif(self.bitcount <= 16):
-            __size = 2
-        elif(self.bitcount <= 32):
-            __size = 4
-        else:
-            __size = 4
-            print('DataInvaild!')
-        return __size
+    def setbitvalue(self, bit:int, pos:int):
+        if(bit == 1):
+            self.__bitvalues =  self.__bitvalues | (1 << pos)
+        elif(bit == 0):
+            self.__bitvalues =  self.__bitvalues & ~(1 << pos)
 
     def __collectionitemcall(self, *arg):
-        if(self.__item is Mainitem.Collection):
-            return self.__otheritemcall(*arg)
-        else:
+        if(self.__item is Mainitem.EndCollection):
             __size = 0
-            __tag_v = self.__item | __size 
-            return __tag_v.to_bytes(length=1)
-
+            __item = ValueType(self.__item, __size)
+            return __item.to_bytes()
+        return self.__otheritemcall(*arg)
 
     def __mainitemcall(self, *arg:Tuple[MainitemBitSetCallable]):
         if(self.__collection):
             return self.__collectionitemcall(*arg)
-        self.bitvalues = 0
-        self.bitcount = 0
+        self.__bitvalues = 0
         if(isinstance(arg, tuple)):
             for i in range(len(arg)):
                 caller = arg[i]
                 caller(self)
-        __size = self.__getbitsize()
-        __arg = self.bitvalues
-        __data = __arg.to_bytes(length=__size, byteorder='little')
-        __tag_v = self.__item | __size
-        return __tag_v.to_bytes(length=1) + __data
+        __data = ValueType(self.__bitvalues).to_bytes()
+        __size = len(__data)
+        __item = ItemValue(self.__item, __size).to_bytes()
+        return __item + __data
 
     def __otheritemcall(self, arg:Union[int, bytes, Callable] = 0):
         if(callable(arg)):
             arg = arg()
         if(isinstance(arg, bytes)):
             __data = arg.rjust(4, b'\x00') if len(arg) == 3 else arg[:4] # 如果3字节就对齐到4字节, 其他情况下就[:4], 超过4字节会截断, 使得始终为1、2、4字节
-            __size = len(__data)
         else:
-            __size = self.__shortest_size(arg)
-            __signed = False
-            if(arg  < 0):
-                __signed = True
-            __data = arg.to_bytes(length=__size, byteorder='little', signed=__signed)
-        __tag_v = self.__item | __size
-        return __tag_v.to_bytes(length=1, byteorder='little') + __data
+            __data = ArgValue(arg).to_bytes()
+        __size = len(__data)
+        __item = ItemValue(self.__item, __size).to_bytes()
+        return __item + __data
 
     def __call__(self, *arg:tuple):
         if(not self.__mainitem or (len(arg) == 1 and not callable(arg[0]))):
             return self.__otheritemcall(*arg)
         else:
             return self.__mainitemcall(*arg)
-            
-    def __eq__(self, value):
-        if(type(value).__name__ != type(self).__name__):
-            return False
-        return self.__item == value.__item
 
 # Mainitem的Input/Output/Feature使用的位类型的参数定义
 class MainitemBitPart:
@@ -208,7 +221,7 @@ class MainitemBitPart:
         value = value & 0x1ff
         __args = ''
         __cnt = 0
-        for i in range(9):
+        for i in range(len(MainitemBits)):
             __value = (value >> i) & 1
             if(__value == 1):
                 if(__cnt == 0):
@@ -225,13 +238,8 @@ class MainitemBitSetCallable:
         self.__bit = bitvalue
         self.__pos = bitpos
     
-    def __call__(self, obj:ShortItem):
-        if(self.__pos + 1 > obj.bitcount):
-            obj.bitcount = self.__pos + 1
-        if(self.__bit == 1):
-            obj.bitvalues = obj.bitvalues | (1 << self.__pos)
-        elif(self.__bit == 0):
-            obj.bitvalues = obj.bitvalues & ~(1 << self.__pos)
+    def __call__(self, item:ShortItem):
+        item.setbitvalue(self.__bit, self.__pos)
 
 Data = MainitemBitSetCallable(MainitemBits[0].Data, 0)
 Constant = MainitemBitSetCallable(MainitemBits[0].Constant, 0)
@@ -276,12 +284,22 @@ class MainitemCollectionPart(IntEnum):
     Vendor_defined_Begin    = 0x80
     Vendor_defined_End      = 0xFF
 
+    def to_bytes(self):
+        length = 0
+        if(self.bit_length() <= 8):
+            length = 1
+        elif(self.bit_length() <= 16):
+            length = 2
+        elif(self.bit_length() <= 32):
+            length = 4
+        return super().to_bytes(length=length, byteorder='little', signed=False)
+
 class MainitemCollectionCallable:
     def __init__(self, part:MainitemCollectionPart):
         self.__part = MainitemCollectionPart(part)
     
     def __call__(self):
-        return self.__part
+        return self.__part.to_bytes()
 
 Physical = MainitemCollectionCallable(MainitemCollectionPart.Physical)
 Application = MainitemCollectionCallable(MainitemCollectionPart.Application)
@@ -327,9 +345,3 @@ StringIndex = ShortItem(Localitem.StringIndex)
 StringMinimum = ShortItem(Localitem.StringMinimum)
 StringMaximum = ShortItem(Localitem.StringMaximum)
 Delimiter = ShortItem(Localitem.Delimiter)
-
-if __name__ == '__main__':
-    print(Collection(0x0aff))
-    print(EndCollection())
-    Input = ShortItem(Mainitem.Input)
-    print(Input(Data, Variable, Absolute))
