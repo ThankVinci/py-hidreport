@@ -97,3 +97,13 @@ class PowerPage(IntEnum):
     __Reserved7_Begin                       = 0x74
     __Reserved7_End                         = 0xFC
 
+    def to_bytes(self):
+        length = 0
+        if(self.bit_length() <= 8):
+            length = 1
+        elif(self.bit_length() <= 16):
+            length = 2
+        elif(self.bit_length() <= 32):
+            length = 4
+        return super().to_bytes(length=length, byteorder='little', signed=False)
+

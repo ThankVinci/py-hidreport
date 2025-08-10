@@ -128,3 +128,13 @@ class TelephonyDevicePage(IntEnum):
     __Reserved11_Begin                      = 0x14C
     __Reserved11_End                        = 0xFFFF
 
+    def to_bytes(self):
+        length = 0
+        if(self.bit_length() <= 8):
+            length = 1
+        elif(self.bit_length() <= 16):
+            length = 2
+        elif(self.bit_length() <= 32):
+            length = 4
+        return super().to_bytes(length=length, byteorder='little', signed=False)
+

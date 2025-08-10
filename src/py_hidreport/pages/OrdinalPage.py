@@ -23,5 +23,16 @@ class OrdinalPage(IntEnum):
                 __pseudo_member._value_ = value
                 # 缓存以避免重复创建
                 cls._value2member_map_[value] = __pseudo_member
+                setattr(cls, __pseudo_member._name_, __pseudo_member)
             return __pseudo_member
         raise ValueError(f"{value} is not a valid OrdinalPage")
+    
+    def to_bytes(self):
+        length = 0
+        if(self.bit_length() <= 8):
+            length = 1
+        elif(self.bit_length() <= 16):
+            length = 2
+        elif(self.bit_length() <= 32):
+            length = 4
+        return super().to_bytes(length=length, byteorder='little', signed=False)

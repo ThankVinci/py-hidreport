@@ -17,3 +17,13 @@ class SoCPage(IntEnum):
     __Reserved0_Begin                       = 0x0B
     __Reserved0_End                         = 0xFFFF
 
+    def to_bytes(self):
+        length = 0
+        if(self.bit_length() <= 8):
+            length = 1
+        elif(self.bit_length() <= 16):
+            length = 2
+        elif(self.bit_length() <= 32):
+            length = 4
+        return super().to_bytes(length=length, byteorder='little', signed=False)
+
