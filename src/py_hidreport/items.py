@@ -2,7 +2,7 @@ from __future__ import annotations # 延迟类型解析, 使得包内一些__私
 from enum import IntEnum
 from typing import Union, Callable, Tuple
 
-__all__ = ['HIDItem_size2bSize', 'HIDItem_bSize2Size', 'ItemValue', 'ArgValue', 
+__all__ = ['HIDItem_size2bSize', 'HIDItem_bSize2Size', 'ItemValue', 'ArgValue', 'ReportDescContext',
            'ShortItems', 'MainitemCollectionPart', 'MainitemBitPart', 
            'Data', 'Constant', 'Array', 'Variable', 'Absolute', 'Relative', 
            'NoWrap', 'Wrap', 'Linear', 'Nonlinear', 'PreferredState', 'NoPreferred', 
@@ -13,6 +13,44 @@ __all__ = ['HIDItem_size2bSize', 'HIDItem_bSize2Size', 'ItemValue', 'ArgValue',
            'UnitExponent', 'Unit', 'ReportSize', 'ReportID', 'ReportCount', 'Push', 'Pop', 
            'Usage', 'UsageMinimum', 'UsageMaximum', 'DesignatorIndex', 'DesignatorMinimum', 'DesignatorMaximum',
            'StringIndex', 'StringMinimum', 'StringMaximum', 'Delimiter' ]
+
+class ReportDescContext:
+    _instance = None
+    @classmethod
+    def Set(cls, instance):
+        cls._instance = instance
+
+    @classmethod
+    def Get(cls)->ReportDescContext:
+        if(cls._instance is None):
+            cls.Set(ReportDescContext())
+        return cls._instance
+    
+    @classmethod
+    def Data(cls)->bytes:
+        return cls.Get().data()
+    
+    @classmethod
+    def Clear(cls):
+        cls.Get().clear()
+    
+    @classmethod
+    def Push(cls, buff:bytes):
+        cls.Get().push(buff)
+    
+    def __init__(self):
+        self.__buff = b''
+
+    def data(self)->bytes:
+        return self.__buff
+    
+    def clear(self):
+        self.__buff = b''
+    
+    def push(self, buff):
+        self.__buff += buff
+
+ReportDescContext.Set(ReportDescContext())
 
 class Mainitem(IntEnum):
     Input           = 0b10000000 # 最后两位按实际的来
@@ -170,10 +208,13 @@ class ShortItem:
         return __item + __data
 
     def __call__(self, *arg:tuple):
+        buff = b''
         if(not self.__mainitem or (len(arg) == 1 and not callable(arg[0]))):
-            return self.__otheritemcall(*arg)
+            buff = self.__otheritemcall(*arg)
         else:
-            return self.__mainitemcall(*arg)
+            buff = self.__mainitemcall(*arg)
+        ReportDescContext.Push(buff)
+        return buff
 
 # Mainitem的Input/Output/Feature使用的位类型的参数定义
 class MainitemBitPart:

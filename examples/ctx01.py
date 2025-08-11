@@ -1,7 +1,9 @@
 from py_hidreport.items import *
 from py_hidreport.usages import *
 from py_hidreport.pages import *
-from py_hidreport.parser import ReportDescParser
+from py_hidreport.ctx import ReportDescDefContext
+
+ReportDescContext.Set(ReportDescDefContext())
 
 def main():
     code = '''UsagePage(GenericDesktop)
@@ -36,15 +38,8 @@ def main():
     code = code[:-1]
     # print(code)
     bin = eval(code)
-    print(bin)
-    code = ReportDescParser.parse(bin)
-    # print(code)
-    code = code.replace('\n','+')
-    code = code.replace(' ','')
-    code = code[:-1]
-    bin = eval(code)
-    print(bin)
-    
+    print(ReportDescContext.Data())
+
 
 if __name__ == '__main__':
     main()
