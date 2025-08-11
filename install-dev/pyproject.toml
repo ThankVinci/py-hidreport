@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "py_hidreport"
-version = "0.0.1.dev1"
+version = "0.0.2.dev1"
 authors = [{ name = "ThankVinci", email = "thankvinci@163.com" }]
 description = "a realization of report description coder."
 readme = "README.md"
