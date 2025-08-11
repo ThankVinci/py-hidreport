@@ -37,7 +37,9 @@ def main():
     code = code.replace(' ','')
     code = code[:-1]
     # print(code)
-    bin = eval(code)
+    exec(code)
+    exec(code)
+    exec(code)
     print(ReportDescContext.Data())
 
 
