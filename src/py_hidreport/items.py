@@ -154,6 +154,8 @@ class ItemValue(ValueType):
     
     def Item(self)->ShortItem:
         __item = self & 0b11111100
+        if(__item not in ShortItems.keys()):
+            raise ValueError(f'{__item:b} is not in ShortItems')
         return ShortItems[__item]
 
     def Size(self)->int:

@@ -11,7 +11,7 @@ if __name__ == '__main__':
     print(root_path)
     sys.path.append(root_path)
 
-__all__ = ['UsagePages',
+__all__ = ['UsagePages', 'Page', 
            'Undefined', 'GenericDesktop', 'SimulationControls', 'VRControls', 
            'SportControls', 'GameControls', 'GenericDeviceControls', 'Keyboard', 'Keypad', 
            'LED', 'Button', 'Ordinal', 'TelephonyDevice', 'Consumer', 'Digitizers', 'Haptics', 
@@ -19,7 +19,7 @@ __all__ = ['UsagePages',
            'Sensors', 'MedicalInstrument', 'BrailleDisplay', 'LightingAndIllumination',
            'Monitor', 'MonitorEnumerated', 'VESAVirtualControls', 'Power',
            'BatterySystem', 'BarcodeScanner', 'Scales', 'MagneticStripeReader', 'CameraControl', 
-           'Arcade', 'GamingDevice', 'FIDOAlliance', 'VendordefinedFF01']
+           'Arcade', 'GamingDevice', 'FIDOAlliance', 'VendordefinedFF00', 'VendordefinedFFFF']
 
 from py_hidreport.pages import *
 
@@ -78,13 +78,13 @@ class UsagePage(IntEnum):
     FIDOAlliance                = FIDOAlliancePageId
     __Reserved9_BEGIN           = 0xF1D1 # 0xF1D0~0xFEFF
     __Reserved9_END             = 0xFEFF
-    Vendordefined_BEGIN         = 0xFF00
-    Vendordefined_END           = 0xFFFF
-    Vendordefined               = lambda value:UsagePage(value) # 0xFF00~0xFFFF
+    VendordefinedFF00           = 0xFF00
+    VendordefinedFFFF           = 0xFFFF
+    Vendordefined               = lambda value:UsagePage(value) # 0xFF01~0xFFFE
     
     @classmethod
     def _missing_(cls, value):
-        if cls.Vendordefined_BEGIN <= value <= cls.Vendordefined_END:
+        if cls.VendordefinedFF00 <= value <= cls.VendordefinedFFFF:
             __pseudo_member = cls._value2member_map_.get(value)
             if __pseudo_member is None:
                 # 构造一个临时的枚举对象
@@ -122,6 +122,9 @@ class Page():
         __usage:IntEnum = __page(usage_v)
         return f'{__page.__name__}.{__usage.name}'
     
+    def value(self)->int:
+        return int(self.__page)
+
     def __call__(self):
         return self.__page.to_bytes()
 
@@ -162,4 +165,6 @@ CameraControl = Page(UsagePage.CameraControl)
 Arcade = Page(UsagePage.Arcade)
 GamingDevice = Page(UsagePage.GamingDevice)
 FIDOAlliance = Page(UsagePage.FIDOAlliance)
+VendordefinedFF00 = Page(UsagePage.VendordefinedFF00)
+VendordefinedFFFF = Page(UsagePage.VendordefinedFFFF)
 VendordefinedFF01 = Page(UsagePage.Vendordefined(0xFF01))
