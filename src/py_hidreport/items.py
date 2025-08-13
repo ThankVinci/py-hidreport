@@ -162,7 +162,6 @@ class ItemValue(ValueType):
 class ShortItem:
     def __init__(self, item:Union[Mainitem, Globalitem, Localitem]):
         self.__bitvalues = 0
-        self.__bitcount = 0
         self.__mainitem = False
         self.__collection= False
         __type = HIDItemtype(item & HIDItemtype.ITEMMASKS)
@@ -175,7 +174,7 @@ class ShortItem:
         elif(__type is HIDItemtype.LOCALITEM):
             self.__item = Localitem(item)
         else:
-            raise ValueError()
+            raise ValueError(f'{__type} is a undefined type')
         ShortItems[self.__item] = self
 
     def name(self)->str:

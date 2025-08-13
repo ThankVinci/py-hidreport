@@ -14,14 +14,15 @@ from py_hidreport.pages import *
 class ReportDescParser:
     @classmethod
     def parse(cls, buff:bytes)->str:
+        if(not isinstance(buff, bytes)):
+            raise ValueError(f'{buff} is not a bytes')
         idx = 0
         current_page = Undefined # 当前的用例页
         context = ''
         while(idx < len(buff)):
             shortitem = ItemValue(buff[idx])
             if(shortitem == 0):
-                print('error')
-                break
+                raise ValueError(f'{shortitem} is zero')
             item = shortitem.Item()
             size = shortitem.Size()
             idx += 1
@@ -44,3 +45,17 @@ class ReportDescParser:
             context += line
             context += '\n'
         return context
+    
+    @classmethod
+    def parseitem(cls, buff:bytes):
+        if(not isinstance(buff, bytes)):
+            raise ValueError(f'{buff} is not a bytes')
+        if(len(buff) <= 0):
+            raise ValueError(f'{buff} is empty')
+        # 只用于解析出单个item
+        shortitem = ItemValue(buff[0])
+        if(shortitem == 0):
+            raise ValueError(f'{shortitem} is zero')
+        item = shortitem.Item()
+        return item
+        
