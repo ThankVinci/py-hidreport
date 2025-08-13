@@ -1,6 +1,6 @@
 from __future__ import annotations # 延迟类型解析, 使得包内一些__私有的类型也可以作为另一个类型的参数类型注解, 也可以避免循环引用的问题
 from enum import IntEnum
-from typing import Union, Callable, Tuple
+from typing import Union, Callable, Tuple, List
 
 __all__ = ['HIDItem_size2bSize', 'HIDItem_bSize2Size', 'ItemValue', 'ArgValue', 'ReportDescContext',
            'ShortItems', 'MainitemCollectionPart', 'MainitemBitPart', 
@@ -39,16 +39,27 @@ class ReportDescContext:
         cls.Get().push(buff)
     
     def __init__(self):
-        self.__buff = b''
+        self.__ctx:List[bytes] = []
 
     def data(self)->bytes:
-        return self.__buff
+        __buff = b''
+        for i in range(len(self.__ctx)):
+            __buff += self.__ctx[i]
+        return __buff
     
     def clear(self):
-        self.__buff = b''
+        self.__ctx.clear()
     
-    def push(self, buff):
-        self.__buff += buff
+    def push(self, buff:bytes):
+        if(isinstance(buff, bytes)):
+            self.__ctx.append(buff)
+        else:
+            raise ValueError(f"{buff} is not a bytes")
+    
+    def prev(self)->bytes:
+        if(len(self.__ctx) > 0):
+            return self.__ctx[-1]
+        return False
 
 ReportDescContext.Set(ReportDescContext())
 
