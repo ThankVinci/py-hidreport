@@ -78,8 +78,8 @@ class UsagePage(IntEnum):
     FIDOAlliance                = FIDOAlliancePageId
     __Reserved9_BEGIN           = 0xF1D1 # 0xF1D0~0xFEFF
     __Reserved9_END             = 0xFEFF
-    VendordefinedFF00           = 0xFF00
-    VendordefinedFFFF           = 0xFFFF
+    VendordefinedFF00           = VendordefinedFF00PageId
+    VendordefinedFFFF           = VendordefinedFFFFPageId
     Vendordefined               = lambda value:UsagePage(value) # 0xFF01~0xFFFE
     
     @classmethod
@@ -168,3 +168,4 @@ FIDOAlliance = Page(UsagePage.FIDOAlliance)
 VendordefinedFF00 = Page(UsagePage.VendordefinedFF00)
 VendordefinedFFFF = Page(UsagePage.VendordefinedFFFF)
 VendordefinedFF01 = Page(UsagePage.Vendordefined(0xFF01))
+Vendordefined = lambda v:Page(UsagePage.Vendordefined(v))

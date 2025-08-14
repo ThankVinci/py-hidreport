@@ -50,6 +50,8 @@ def main():
     Input(Data, Variable, Relative)
     EndCollection()
     EndCollection()
+    UsagePage(VendordefinedFF00)
+    UsagePage(VendordefinedFF01)
     '''
     code = code.replace('\n','+')
     code = code.replace(' ','')

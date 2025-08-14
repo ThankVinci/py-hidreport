@@ -1,5 +1,3 @@
-Pages = {}
-
 from .GenericDesktopPage import *
 from .SimulationControlsPage import *
 from .VRControlsPage import *
@@ -35,6 +33,29 @@ from .CameraControlPage import *
 from .ArcadePage import *
 from .GamingDevicePage import *
 from .FIDOAlliancePage import *
+from .VendordefinedPage import *
+
+class PagesManager:
+    _instance = None
+    @classmethod
+    def Get(cls):
+        if(cls._instance is None):
+            cls._instance = PagesManager()
+        return cls._instance
+    
+    def __init__(self):
+        self.__pages = {}
+
+    def __setitem__(self, key, value):
+        self.__pages[key] = value
+
+    def __getitem__(self, key):
+        if(key not in self.__pages.keys() and isinstance(key, int)):
+            if(VendordefinedFF00PageId <= key <= VendordefinedFFFFPageId):
+                self.__setitem__(key, VendordefinedPage)
+        return self.__pages.get(key)
+
+Pages = PagesManager.Get()
 
 Pages[GenericDesktopPageId]             = GenericDesktopPage
 Pages[SimulationControlsPageId]         = SimulationControlsPage
