@@ -32,13 +32,17 @@ class ReportDescParser:
             if(size > 0):
                 args = f'({hex(data)})'
                 if(item is Usage and not (current_page is Undefined)):
-                    args = f'({current_page.usage(data)})'
+                    if(VendordefinedFF00.value() <= current_page.value() <= VendordefinedFFFF.value()):
+                        args = f'(VendordefinedPage({hex(data)}))'
+                    else:
+                        args = f'({current_page.usage(data)})'
                 if(item is UsagePage):
                     if(data in UsagePages.keys()):
                         current_page = UsagePages[data]
-                    elif(data >= VendordefinedFF00.value() and data <= VendordefinedFFFF.value()):
-                        current_page = Page(data)
-                    args = f'({current_page.name()})'
+                        args = f'({current_page.name()})'
+                    elif(VendordefinedFF00.value() <= data <= VendordefinedFFFF.value()):
+                        current_page = Vendordefined(data)
+                        args = f'(Vendordefined({hex(data)}))'
                 if(item is Collection):
                     args = f'({MainitemCollectionPart(data).name})'
                 if(item in (Input, Output, Feature)):

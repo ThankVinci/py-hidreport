@@ -19,7 +19,7 @@ __all__ = ['UsagePages', 'Page',
            'Sensors', 'MedicalInstrument', 'BrailleDisplay', 'LightingAndIllumination',
            'Monitor', 'MonitorEnumerated', 'VESAVirtualControls', 'Power',
            'BatterySystem', 'BarcodeScanner', 'Scales', 'MagneticStripeReader', 'CameraControl', 
-           'Arcade', 'GamingDevice', 'FIDOAlliance', 'VendordefinedFF00', 'VendordefinedFFFF']
+           'Arcade', 'GamingDevice', 'FIDOAlliance', 'VendordefinedFF00', 'VendordefinedFFFF', 'Vendordefined' ]
 
 from py_hidreport.pages import *
 
@@ -112,7 +112,10 @@ UsagePages:Dict[UsagePage, Page] = {}
 class Page():
     def __init__(self, page:UsagePage):
         self.__page = UsagePage(page)
-        UsagePages[page] = self
+        if(UsagePage.VendordefinedFF00 <= self.__page <= UsagePage.VendordefinedFFFF):
+            ...
+        else:
+            UsagePages[page] = self
     
     def name(self)->str:
         return self.__page.name
@@ -167,5 +170,4 @@ GamingDevice = Page(UsagePage.GamingDevice)
 FIDOAlliance = Page(UsagePage.FIDOAlliance)
 VendordefinedFF00 = Page(UsagePage.VendordefinedFF00)
 VendordefinedFFFF = Page(UsagePage.VendordefinedFFFF)
-VendordefinedFF01 = Page(UsagePage.Vendordefined(0xFF01))
 Vendordefined = lambda v:Page(UsagePage.Vendordefined(v))
