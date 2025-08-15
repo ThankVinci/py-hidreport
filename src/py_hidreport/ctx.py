@@ -14,18 +14,24 @@ from py_hidreport.parser import ReportDescParser
 
 # 此处可以自定义Context, 只要继承ReportDescContext, 并注册为ReportDescContext的唯一实例，那么在调用shortitem的时候就会自动将一部分数据传到context
 # 那么就可以进行描述符状态解析，如果有异常可以在context这边raise出错误
-class ReportDescDefContext(ReportDescContext):
+class ReportDescStdContext(ReportDescContext):
     def push(self, buff:bytes):
         prev = self.prev()
-        if(prev):
+        if(not prev):
+            __1st = ReportDescParser.parseitem(buff)
+            if(__1st is not UsagePage):
+                raise ValueError(f'The 1st Item must be a Usagepage.')
+        else:
             previtem = ReportDescParser.parseitem(prev)
-            print(previtem.name())
         super().push(buff)
+    
+    def data(self)->bytes:
+        # 检查Collection是否正确结束
+        return super().data()
 
 def main():
-    ReportDescContext.Set(ReportDescDefContext())
-    code = '''UsagePage(GenericDesktop)
-    Usage(GenericDesktopPage.Mouse)
+    ReportDescContext.Set(ReportDescStdContext())
+    code = '''Usage(GenericDesktopPage.Mouse)
     Collection(Application)
     Usage(GenericDesktopPage.Pointer)
     Collection (Physical)
@@ -50,8 +56,6 @@ def main():
     Input(Data, Variable, Relative)
     EndCollection()
     EndCollection()
-    UsagePage(VendordefinedFF00)
-    UsagePage(VendordefinedFF01)
     '''
     code = code.replace('\n','+')
     code = code.replace(' ','')

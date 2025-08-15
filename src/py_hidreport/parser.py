@@ -31,7 +31,7 @@ class ReportDescParser:
             args = '()'
             if(size > 0):
                 args = f'({hex(data)})'
-                if(item is Usage and not (current_page is Undefined)):
+                if(item is Usage and current_page is not Undefined):
                     if(VendordefinedFF00.value() <= current_page.value() <= VendordefinedFFFF.value()):
                         args = f'(VendordefinedPage({hex(data)}))'
                     else:
