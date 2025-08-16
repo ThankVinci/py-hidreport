@@ -15,10 +15,20 @@ from py_hidreport.parser import ReportDescParser
 # 此处可以自定义Context, 只要继承ReportDescContext, 并注册为ReportDescContext的唯一实例，那么在调用shortitem的时候就会自动将一部分数据传到context
 # 那么就可以进行描述符状态解析，如果有异常可以在context这边raise出错误
 class ReportDescStdContext(ReportDescContext):
+    def __init__(self):
+        super().__init__()
+        self.__incomplete_collection = 0
     def push(self, buff:bytes):
         prev = self.prev()
+        curitem = ReportDescParser.parseitem(buff)
+        if(curitem is Collection):
+            self.__incomplete_collection += 1
+        elif(curitem is EndCollection):
+            self.__incomplete_collection -= 1
+        if(self.__incomplete_collection < 0):
+            raise ValueError(f'Invalid Collection pair.')
         if(not prev):
-            __1st = ReportDescParser.parseitem(buff)
+            __1st = curitem
             if(__1st is not UsagePage):
                 raise ValueError(f'The 1st Item must be a Usagepage.')
         else:
@@ -26,12 +36,14 @@ class ReportDescStdContext(ReportDescContext):
         super().push(buff)
     
     def data(self)->bytes:
-        # 检查Collection是否正确结束
+        if(self.__incomplete_collection > 0):
+            raise ValueError(f'Lack of EndCollection.')
         return super().data()
 
 def main():
     ReportDescContext.Set(ReportDescStdContext())
-    code = '''Usage(GenericDesktopPage.Mouse)
+    code = '''UsagePage(GenericDesktop)
+    Usage(GenericDesktopPage.Mouse)
     Collection(Application)
     Usage(GenericDesktopPage.Pointer)
     Collection (Physical)
@@ -61,7 +73,7 @@ def main():
     code = code.replace(' ','')
     code = code[:-1]
     exec(code)
-    # print(ReportDescContext.Data())
+    print(ReportDescContext.Data())
 
 if __name__ == '__main__':
     main()
