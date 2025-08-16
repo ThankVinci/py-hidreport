@@ -1,6 +1,6 @@
 # Python USB HID Report Descriptor
 
-A realization of report description parser and codec context.
+A realization of report descriptor parser and codec context.
 
 ## parser example
 
