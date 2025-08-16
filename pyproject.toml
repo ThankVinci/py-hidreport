@@ -4,9 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "py_hidreport"
+keywords = ["hid", "report-desc", "usb"]
 dynamic = ["version"]
 authors = [{ name = "ThankVinci", email = "thankvinci@163.com" }]
-description = "a realization of report description parser and codec context."
+description = "a realization of report descriptor parser and codec context."
 readme = "README.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.8"
