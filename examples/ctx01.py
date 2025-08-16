@@ -1,9 +1,9 @@
 from py_hidreport.items import *
 from py_hidreport.usages import *
 from py_hidreport.pages import *
-from py_hidreport.ctx import ReportDescDefContext
+from py_hidreport.ctx import ReportDescStdContext
 
-ReportDescContext.Set(ReportDescDefContext())
+ReportDescContext.Set(ReportDescStdContext())
 
 def main():
     code = '''UsagePage(GenericDesktop)
