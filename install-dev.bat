@@ -1,8 +1,9 @@
 @echo off
 
-if exist ".\install-dev\build" (
-    @rmdir /Q /S ".\install-dev\build"
-)
+@call .\prebuild.bat
+set DEV_VER=dev0
+set PKG_VERSION=%FULL_VER%.%DEV_VER%
 
-pip install ./install-dev
+pip install . 
+
 pause

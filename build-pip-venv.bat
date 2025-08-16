@@ -1,10 +1,9 @@
 @echo off
 
+@call .\prebuild.bat
+set PKG_VERSION=%FULL_VER%
+
 python -m pip install --upgrade pip build setuptools wheel
+python -m build --wheel
 
-if exist ".\build\build" (
-    @rmdir /Q /S ".\build\build"
-)
-
-cd build && python -m build --wheel && cd ..\
 pause

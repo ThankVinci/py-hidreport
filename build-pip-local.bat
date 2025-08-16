@@ -1,10 +1,10 @@
 @echo off
 
+@call .\prebuild.bat
+set ALPHA_VER=a0
+set PKG_VERSION=%FULL_VER%%ALPHA_VER%
+
 python -m pip install --upgrade pip build setuptools wheel
+python -m build --wheel --no-isolation
 
-if exist ".\build\build" (
-    @rmdir /Q /S ".\build\build"
-)
-
-cd build && python -m build --wheel --no-isolation && cd ..\
 pause
