@@ -1,0 +1,6 @@
+@echo off
+
+set MAJOR_VER=1
+set MINOR_VER=0
+set BUILD_VER=0
+set FULL_VER=%MAJOR_VER%.%MINOR_VER%.%BUILD_VER%
