@@ -38,8 +38,6 @@ def main():
     code = code[:-1]
     # print(code)
     exec(code)
-    exec(code)
-    exec(code)
     print(ReportDescContext.Data())
 
 
