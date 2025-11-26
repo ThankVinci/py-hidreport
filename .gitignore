@@ -1,7 +1,7 @@
+/build
+/dist
+/src/py_hidreport.egg-info
 /src/py_hidreport/__pycache__
 /src/py_hidreport/items/__pycache__
 /src/py_hidreport/pages/__pycache__
 /src/py_hidreport/items/Main/__pycache__
-/src/py_hidreport.egg-info
-/build
-/dist
